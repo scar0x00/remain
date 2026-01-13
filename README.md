@@ -1,87 +1,22 @@
-# Welcome to React Router!
+# Remain
 
-A modern, production-ready template for building full-stack React applications using React Router.
+This app works mainly as a flashcard generator and allows the user to start study sessions from the generated flashcards.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
+The app generates flashcards decks using LLMs (mainly Gemini 3 Flash and Pro, Grok 4.1 Fast, GLM 4.7 and Kimi K2) but also allows the user to edit the flashcards in places before saving the decks. Later on the user can also modify its decks. It also uses Voxtral, Mistral OCR and Deepseek OCR.
 
-## Features
+The app also keeps track of how many right and wrong ansers the user has gotten, so it can track performance and evaluate how good the user has learned a topic and if it can recall the content that they are meant to memorize.
 
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
+Flashcards decks are basically YAML files that can be stored in Github or in the default storage backend: Cloudflare R2.
 
-## Getting Started
+PDF files, website URL and plain HTML/MD files can be uploaded to the chat so the agents can extract information and knowledge from them.
 
-### Installation
+Theres also an **experimental** mode that allows the user to type in the answer to the questions so an LLM can evaluate if the answer is right or wrong by comparing the user answer with the stored answer on the deck.
 
-Install the dependencies:
+The app uses:
 
-```bash
-npm install
-```
-
-### Development
-
-Start the development server with HMR:
-
-```bash
-npm run dev
-```
-
-Your application will be available at `http://localhost:5173`.
-
-## Building for Production
-
-Create a production build:
-
-```bash
-npm run build
-```
-
-## Deployment
-
-### Docker Deployment
-
-To build and run using Docker:
-
-```bash
-docker build -t my-app .
-
-# Run the container
-docker run -p 3000:3000 my-app
-```
-
-The containerized application can be deployed to any platform that supports Docker, including:
-
-- AWS ECS
-- Google Cloud Run
-- Azure Container Apps
-- Digital Ocean App Platform
-- Fly.io
-- Railway
-
-### DIY Deployment
-
-If you're familiar with deploying Node applications, the built-in app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-```
-├── package.json
-├── package-lock.json (or pnpm-lock.yaml, or bun.lockb)
-├── build/
-│   ├── client/    # Static assets
-│   └── server/    # Server-side code
-```
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
-
----
-
-Built with ❤️ using React Router.
+- React Router
+- Jotai
+- Shadcn and Tailwindcss for UI
+- Langchain for the agents
+- R2 for persistent storage
+- better-auth for authentication
