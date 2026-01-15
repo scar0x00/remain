@@ -12,11 +12,12 @@ export const MessageEntry: React.FC<{ message: Message }> = ({ message }) => {
             "bg-gray-100 text-gray-800": message.role === "user",
             "bg-gray-800 text-gray-100": message.role === "agent",
         }, 
-        "w-2/3",
+        "max-w-2/3",
         "rounded-md",
         "p-4",
         "odd:self-end even:self-start",
-        "text-left"
+        "text-left",
+        "wrap-break-word"
         )}>
             {message.content}
         </p>
