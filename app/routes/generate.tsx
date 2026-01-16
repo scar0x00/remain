@@ -7,7 +7,13 @@ import { useAtom } from "jotai";
 import { useEffect } from "react";
 import { getAgentCompletion } from "~/lib/agents/deckGenerationAgent";
 
-export async function loader({ }: Route.LoaderArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
+    console.log(request);
+    if (!request.headers.has("X-Chat-Id")) {
+        return { 
+            chatId: crypto.randomUUID()
+        }
+    }
     return {};
 }
 
@@ -48,13 +54,18 @@ export default function Generate({
 
 
     return (
-        <div className="h-screen w-screen lg:px-96 flex flex-col justify-between">
-            <div className="w-full h-2/3 pt-12">
-                <ChatHistory messages={chatHistory} />
+        <div className="grid grid-rows-1 grid-cols-5 h-screen w-screen" id="main-container">
+            <div className="col-start-1 flex flex-col justify-start items-stretch px-3 pt-8 bg-gray-50 text-xl rounded-r-sm" id="sidebar">
+                <h1 className="self-start">Remain</h1>
+
             </div>
-            <div className="pb-12 w-full flex flex-col items-center">
-                <fetcher.Form className="md:w-4/5 flex flex-col items-stretch" method="post">
-                    <textarea className="resize-none w-full border-2 border-b-transparent h-24 p-4  focus:outline-none focus:ring-0 rounded-t-md
+            <div className="col-start-2 col-span-4 px-40 flex flex-col justify-between">
+                <div className="w-full h-2/3 pt-12 px-48">
+                    <ChatHistory messages={chatHistory} />
+                </div>
+                <div className="pb-12 w-full flex flex-col items-center">
+                    <fetcher.Form className="md:w-4/5 flex flex-col items-stretch" method="post">
+                        <textarea className="resize-none w-full border-2 border-b-transparent h-24 p-4  focus:outline-none focus:ring-0 rounded-t-md
                         scrollbar-thin
                         scrollbar-track-transparent
                         scrollbar-thumb:neutral-700/40
@@ -65,37 +76,39 @@ export default function Generate({
                         [&::-webkit-scrollbar-thumb]:rounded-xl
                         hover:[&::-webkit-scrollbar-thumb]:bg-neutral-500/80
                         transition-colors"
-                        name="user-message"
-                        id="user-message-field"
-                        disabled={fetcher.state === "loading"}></textarea>
-                    <div className="grid grid-cols-2 grid-rows-1 gap-3 py-2 border-2 border-t-transparent px-2 rounded-b-md">
-                        <button className="justify-self-start p-1.5 border-2 border-gray-400 rounded-full hover:cursor-pointer">
-                            <Paperclip size={18} strokeWidth={1.5} className="text-gray-400" />
-                        </button>
-                        <button
-                            className="justify-self-end place-self-end p-1.5 border-2 border-gray-400 rounded-full hover:cursor-pointer"
-                            onClick={(e) => {
-                                const form = e.currentTarget.form;
-                                const textarea = form?.elements.namedItem('user-message') as HTMLTextAreaElement;
-                                const content = textarea?.value || '';
-                                setChatHistory((chat) => [
-                                    ...chat,
-                                    {
-                                        role: "user",
-                                        content: content
+                            name="user-message"
+                            id="user-message-field"
+                            disabled={fetcher.state === "loading"}></textarea>
+                        <div className="grid grid-cols-3 grid-rows-1 gap-3 py-2 border-2 border-t-transparent px-2 rounded-b-md">
+                            <button className="justify-self-start p-1.5 border-2 border-gray-400 rounded-full hover:cursor-pointer">
+                                <Paperclip size={18} strokeWidth={1.5} className="text-gray-400" />
+                            </button>
+                            <input type="file" className="text-center hover:cursor-pointer text-transparent" name="knowledge-source" id="knowledge-source" />
+                            <button
+                                className="justify-self-end place-self-end p-1.5 border-2 border-gray-400 rounded-full hover:cursor-pointer"
+                                onClick={(e) => {
+                                    const form = e.currentTarget.form;
+                                    const textarea = form?.elements.namedItem('user-message') as HTMLTextAreaElement;
+                                    const content = textarea?.value || '';
+                                    setChatHistory((chat) => [
+                                        ...chat,
+                                        {
+                                            role: "user",
+                                            content: content
+                                        }
+                                    ]);
+                                    if (form) {
+                                        fetcher.submit(form);
                                     }
-                                ]);
-                                if (form) {
-                                    fetcher.submit(form);
-                                }
-                            }}
-                            type="submit" disabled={fetcher.state === "loading"}
-                        >
-                            <SendHorizontal size={18} strokeWidth={1.5} className="text-gray-400" />
-                        </button>
-                    </div>
-                    <input type="hidden" name="chatUUID" value={"hi"} />
-                </fetcher.Form>
+                                }}
+                                type="submit" disabled={fetcher.state === "loading"}
+                            >
+                                <SendHorizontal size={18} strokeWidth={1.5} className="text-gray-400" />
+                            </button>
+                        </div>
+                        <input type="hidden" name="chatUUID" value={"hi"} />
+                    </fetcher.Form>
+                </div>
             </div>
         </div>
     );
