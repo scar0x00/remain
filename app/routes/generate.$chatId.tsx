@@ -25,7 +25,7 @@ export async function action({
     });
     return {
         role: "agent",
-        content: response.structuredResponse.summary,
+        content: response.structuredResponse,
     };
 }
 
@@ -40,7 +40,10 @@ export default function GenerateChatId({
             // console.log(fetcher.data);
             setChatHistory((chat) => [
                 ...chat,
-                fetcher.data
+                {
+                    role: fetcher.data.role,
+                    content: fetcher.data.content.answer
+                }
             ]);
         }
     }, [fetcher.data]);

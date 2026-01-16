@@ -2,16 +2,20 @@ import { llm } from "~/lib/agents/models/Grok4.1Fast";
 import * as z from "zod";
 import { createAgent, tool } from "langchain";
 import { MemorySaver } from "@langchain/langgraph";
+import { readFileSync } from "fs";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
 
 console.log(import.meta.url);
 console.log(process.argv[1]);
 
 const checkpointer = new MemorySaver();
 
-const SYSTEM_PROMT = `Nothing`;
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const SYSTEM_PROMPT = readFileSync(join(__dirname, 'SYSTEM_PROMPT.md'), 'utf-8');
 
 const responseFormat = z.object({
-  summary: z.string(),
+  answer: z.string(),
   deck: z.array(
     z.object(
       { front: z.string(), back: z.string() },
@@ -21,7 +25,7 @@ const responseFormat = z.object({
 
 export const deckGenerationAgent = createAgent({
   model: llm,
-  systemPrompt: SYSTEM_PROMT,
+  systemPrompt: SYSTEM_PROMPT,
   responseFormat,
   checkpointer,
 });
@@ -44,6 +48,8 @@ export async function getAgentCompletion({
     { messages: [{ role: "user", content: userMessage }] },
     config,
   );
+
+  console.log(response.structuredResponse.answer);
 
   return response;
 }
