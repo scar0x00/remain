@@ -9,31 +9,6 @@ export async function loader({ params }: Route.LoaderArgs) {
     return {};
 }
 
-// export async function action({
-//     request,
-//     params
-// }: Route.ActionArgs) {
-//     let formData = await request.formData();
-//     console.log(formData);
-//     const userMessage = formData.get('user-message')
-//     if (typeof userMessage !== "string") throw "Unexpected error";
-//     if (userMessage === undefined) throw "Unexpected error";
-
-//     if (params.chatId === undefined) {
-//         return redirect(`/generate/${crypto.randomUUID()}`);
-//     }
-
-//     const response = await getAgentCompletion({
-//         userMessage: userMessage,
-//         threadId: params.chatId,
-//         userId: "1"
-//     });
-//     return {
-//         role: "agent",
-//         content: response.structuredResponse.summary,
-//     };
-// }
-
 export default function Generate({ }: Route.ComponentProps) {
     return (
         <div className="grid grid-rows-1 grid-cols-5 h-screen w-screen" id="main-container">

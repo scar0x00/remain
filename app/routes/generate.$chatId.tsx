@@ -7,16 +7,6 @@ import { useAtom } from "jotai";
 import { useEffect } from "react";
 import { getAgentCompletion } from "~/lib/agents/deckGenerationAgent";
 
-// export async function loader({ request }: Route.LoaderArgs) {
-//     // console.log(request);
-//     // if (!request.headers.has("X-Chat-Id")) {
-//     //     return { 
-//     //         chatId: crypto.randomUUID()
-//     //     }
-//     // }
-//     return {};
-// }
-
 export async function action({
     request,
     params
