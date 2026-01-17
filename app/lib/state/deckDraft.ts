@@ -5,4 +5,4 @@ interface Flashcard {
   back: string;
 }
 
-export const chatHistoryAtom = atom<Flashcard[]>([]);
+export const deckDraftAtom = atom<Flashcard[]>([]);

@@ -1,25 +1,57 @@
+// import {
+//     type FileUpload,
+//     parseFormData,
+// } from "@remix-run/form-data-parser";
 import { useFetcher } from "react-router";
-import { Paperclip, SendHorizontal } from "lucide-react";
+import { Paperclip, SendHorizontal, File } from "lucide-react";
 import type { Route } from "./+types/generate.$chatId";
 import { ChatHistory } from "~/lib/my-components/ChatHistory";
 import { chatHistoryAtom } from "~/lib/state/chatHistory";
 import { useAtom } from "jotai";
-import { useEffect } from "react";
+import React, { useCallback, useEffect, useRef, useState, type ChangeEvent } from "react";
 import { getAgentCompletion } from "~/lib/agents/deckGenerationAgent";
+import { deckDraftAtom } from "~/lib/state/deckDraft";
 
 export async function action({
     request,
     params
 }: Route.ActionArgs) {
+    // const uploadHandler = async (fileUpload: FileUpload) => {
+    //     console.log(fileUpload);
+    //     if (fileUpload.fieldName === "knowledge-source") {
+    //         console.log(fileUpload);
+    //     }
+    // };
+
+    // const formData = await parseFormData(
+    //     request,
+    //     uploadHandler,
+    // );
+
     let formData = await request.formData();
+    let fileContent: string | undefined = undefined;
+    if (formData.get("knowledge-source")) {
+        const file = formData.get("knowledge-source") as File;
+        fileContent = await file.text();
+    }
     console.log(formData);
     const userMessage = formData.get('user-message')
     if (typeof userMessage !== "string") throw "Unexpected error";
     if (userMessage === undefined) throw "Unexpected error";
     if (params.chatId === undefined) throw "Chat ID is empty"
 
+    let message = "";
+    if (fileContent !== undefined) {
+        message = JSON.stringify({
+            userMessage,
+            fileContent
+        })
+    } else {
+        message = userMessage
+    }
+
     const response = await getAgentCompletion({
-        userMessage: userMessage,
+        userMessage: message,
         threadId: params.chatId,
         userId: "1"
     });
@@ -33,11 +65,32 @@ export default function GenerateChatId({
     loaderData,
     params
 }: Route.ComponentProps) {
+    const [prompt, setPrompt] = useState("");
+    const [fileName, setFileName] = useState("");
     const [chatHistory, setChatHistory] = useAtom(chatHistoryAtom);
+    const [deckDraft, setDeckDraft] = useAtom(deckDraftAtom);
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const fetcher = useFetcher();
+
     useEffect(() => {
         if (fetcher.data !== undefined) {
-            // console.log(fetcher.data);
+            if (fileInputRef.current !== null) {
+                fileInputRef.current.value = '';
+            }
+            if (fetcher.data.content.deck !== undefined) {
+                setDeckDraft((deck) => {
+                    if (deck) {
+                        return [
+                            ...deck,
+                            ...fetcher.data.content.deck
+                        ];
+                    } else { 
+                        return fetcher.data.content.deck;
+                    }
+                });
+            }
+            setPrompt("");
+            setFileName("");
             setChatHistory((chat) => [
                 ...chat,
                 {
@@ -48,6 +101,40 @@ export default function GenerateChatId({
         }
     }, [fetcher.data]);
 
+    const onFileChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        if (e.currentTarget.files === null) return;
+        console.log(e.currentTarget?.files[0].name);
+        setFileName(e.currentTarget?.files[0].name);
+    }, [fileName]);
+
+    const onSubmitButtonClick = useCallback((e: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLTextAreaElement>) => {
+        const form = e.currentTarget.form;
+        const textarea = form?.elements.namedItem('user-message') as HTMLTextAreaElement;
+        const content = textarea?.value || '';
+        setChatHistory((chat) => [
+            ...chat,
+            {
+                role: "user",
+                content: content
+            }
+        ]);
+        document.getElementById("chat")?.scroll({top: 100000, behavior: "smooth"});
+        if (form) {
+            fetcher.submit(form);
+        }
+    }, []);
+
+    const handleTextareaChange = useCallback((e: ChangeEvent<HTMLTextAreaElement>) => {
+        setPrompt(e.target.value);
+    }, [])
+
+    const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === 'Enter' && e.shiftKey) {
+            e.preventDefault();
+            onSubmitButtonClick(e);
+        }
+    }, []);
+
 
     return (
         <>
@@ -55,8 +142,15 @@ export default function GenerateChatId({
                 <ChatHistory messages={chatHistory} />
             </div>
             <div className="pb-12 w-full flex flex-col items-center">
-                <fetcher.Form className="md:w-4/5 flex flex-col items-stretch" method="post">
-                    <textarea className="resize-none w-full border-2 border-b-transparent h-24 p-4  focus:outline-none focus:ring-0 rounded-t-md
+                <fetcher.Form className="md:w-4/5 flex flex-col items-stretch" method="post" encType="multipart/form-data">
+                    <textarea
+                        value={prompt}
+                        onChange={handleTextareaChange}
+                        onKeyDown={handleKeyDown}
+                        disabled={
+                            fetcher.state === 'submitting'
+                        }
+                        className="resize-none w-full border-2 border-b-transparent h-24 p-4  focus:outline-none focus:ring-0 rounded-t-md
                         scrollbar-thin
                         scrollbar-track-transparent
                         scrollbar-thumb:neutral-700/40
@@ -69,31 +163,38 @@ export default function GenerateChatId({
                         transition-colors"
                         name="user-message"
                         id="user-message-field"
-                        disabled={fetcher.state === "loading"}></textarea>
-                    <div className="grid grid-cols-3 grid-rows-1 gap-3 py-2 border-2 border-t-transparent px-2 rounded-b-md">
-                        <label htmlFor="knowledge-source"  className="justify-self-start p-1.5 border-2 border-gray-400 rounded-full hover:cursor-pointer">
-                            <Paperclip size={18} strokeWidth={1.5} className="text-gray-400" />
-                        </label>
-                        <input type="file" tabIndex={-1} className="text-center hover:cursor-pointer text-transparent" name="knowledge-source" id="knowledge-source"  hidden/>
+                    >
+                    </textarea>
+                    <div className="grid grid-cols-4 grid-rows-1 gap-3 py-2 border-2 border-t-transparent px-2 rounded-b-md">
+                        <div className="inline-flex col-span-2">
+                            <label htmlFor="knowledge-source" className="justify-self-start p-1.5 border-2 border-gray-400 rounded-full hover:cursor-pointer">
+                                <Paperclip size={18} strokeWidth={1.5} className="text-gray-400" />
+                            </label>
+                            <input
+                                accept="text/*"
+                                ref={fileInputRef}
+                                disabled={
+                                    fetcher.state === 'submitting'
+                                }
+                                onChange={onFileChange}
+                                type="file"
+                                tabIndex={-1}
+                                className="text-center hover:cursor-pointer text-transparent" name="knowledge-source" id="knowledge-source"
+                                hidden
+                            />
+                            {fileName &&
+                                <div className="text-center flex items-center justify-center  text-sm ml-2 max-w-2/3">
+                                    <span className="bg-gray-100 text-gray-500 px-2 py-1.5 rounded-md text-nowrap truncate">
+                                        <File className="inline" size={16} strokeWidth={1.25} /> {fileName}
+                                    </span>
+                                </div>
+                            }
+                        </div>
+
                         <button
                             className="justify-self-end place-self-end p-1.5 border-2 border-gray-400 rounded-full hover:cursor-pointer -col-start-2"
-                            onClick={(e) => {
-                                const form = e.currentTarget.form;
-                                const textarea = form?.elements.namedItem('user-message') as HTMLTextAreaElement;
-                                const content = textarea?.value || '';
-                                setChatHistory((chat) => [
-                                    ...chat,
-                                    {
-                                        role: "user",
-                                        content: content
-                                    }
-                                ]);
-                                if (form) {
-                                    fetcher.submit(form);
-                                    // textarea.value = "";
-                                }
-                            }}
-                            type="submit" disabled={fetcher.state === "loading"}
+                            onClick={onSubmitButtonClick}
+                            type="submit" disabled={fetcher.state === "submitting"}
                         >
                             <SendHorizontal size={18} strokeWidth={1.5} className="text-gray-400" />
                         </button>
