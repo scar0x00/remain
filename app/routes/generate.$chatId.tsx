@@ -71,12 +71,12 @@ export default function GenerateChatId({
                         id="user-message-field"
                         disabled={fetcher.state === "loading"}></textarea>
                     <div className="grid grid-cols-3 grid-rows-1 gap-3 py-2 border-2 border-t-transparent px-2 rounded-b-md">
-                        <button className="justify-self-start p-1.5 border-2 border-gray-400 rounded-full hover:cursor-pointer">
+                        <label htmlFor="knowledge-source"  className="justify-self-start p-1.5 border-2 border-gray-400 rounded-full hover:cursor-pointer">
                             <Paperclip size={18} strokeWidth={1.5} className="text-gray-400" />
-                        </button>
-                        <input type="file" tabIndex={-1} className="text-center hover:cursor-pointer text-transparent" name="knowledge-source" id="knowledge-source" />
+                        </label>
+                        <input type="file" tabIndex={-1} className="text-center hover:cursor-pointer text-transparent" name="knowledge-source" id="knowledge-source"  hidden/>
                         <button
-                            className="justify-self-end place-self-end p-1.5 border-2 border-gray-400 rounded-full hover:cursor-pointer"
+                            className="justify-self-end place-self-end p-1.5 border-2 border-gray-400 rounded-full hover:cursor-pointer -col-start-2"
                             onClick={(e) => {
                                 const form = e.currentTarget.form;
                                 const textarea = form?.elements.namedItem('user-message') as HTMLTextAreaElement;
