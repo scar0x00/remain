@@ -17,7 +17,8 @@ export const MessageEntry: React.FC<{ message: Message }> = ({ message }) => {
         "p-4",
         // "odd:self-end even:self-start",
         "text-left",
-        "wrap-break-word"
+        "wrap-break-word",
+        "chat-entry"
         )}>
             {message.content}
         </p>

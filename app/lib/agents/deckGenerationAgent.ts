@@ -21,6 +21,7 @@ const responseFormat = z.object({
       { front: z.string(), back: z.string() },
     ),
   ).optional(),
+  action: z.enum(["add_to_deck", "replace_deck"]).optional()
 });
 
 export const deckGenerationAgent = createAgent({
@@ -49,7 +50,7 @@ export async function getAgentCompletion({
     config,
   );
 
-  console.log(response.structuredResponse.answer);
+  // console.log(response.structuredResponse.answer);
 
   return response;
 }

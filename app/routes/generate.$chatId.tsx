@@ -16,25 +16,12 @@ export async function action({
     request,
     params
 }: Route.ActionArgs) {
-    // const uploadHandler = async (fileUpload: FileUpload) => {
-    //     console.log(fileUpload);
-    //     if (fileUpload.fieldName === "knowledge-source") {
-    //         console.log(fileUpload);
-    //     }
-    // };
-
-    // const formData = await parseFormData(
-    //     request,
-    //     uploadHandler,
-    // );
-
     let formData = await request.formData();
     let fileContent: string | undefined = undefined;
     if (formData.get("knowledge-source")) {
         const file = formData.get("knowledge-source") as File;
         fileContent = await file.text();
     }
-    console.log(formData);
     const userMessage = formData.get('user-message')
     if (typeof userMessage !== "string") throw "Unexpected error";
     if (userMessage === undefined) throw "Unexpected error";
@@ -78,16 +65,20 @@ export default function GenerateChatId({
                 fileInputRef.current.value = '';
             }
             if (fetcher.data.content.deck !== undefined) {
-                setDeckDraft((deck) => {
-                    if (deck) {
-                        return [
-                            ...deck,
-                            ...fetcher.data.content.deck
-                        ];
-                    } else { 
-                        return fetcher.data.content.deck;
-                    }
-                });
+                if (fetcher.data.content.action === "add_to_deck") {
+                    setDeckDraft((deck) => {
+                        if (deck) {
+                            return [
+                                ...deck,
+                                ...fetcher.data.content.deck
+                            ];
+                        } else {
+                            return fetcher.data.content.deck;
+                        }
+                    });
+                } else if (fetcher.data.content.action === "replace_deck") {
+                    setDeckDraft(fetcher.data.content.deck);
+                }
             }
             setPrompt("");
             setFileName("");
@@ -98,6 +89,11 @@ export default function GenerateChatId({
                     content: fetcher.data.content.answer
                 }
             ]);
+            setTimeout(() => document.querySelector("#chat > .chat-entry:last-child")?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+                inline: 'nearest'
+            }), 100);
         }
     }, [fetcher.data]);
 
@@ -118,7 +114,11 @@ export default function GenerateChatId({
                 content: content
             }
         ]);
-        document.getElementById("chat")?.scroll({top: 100000, behavior: "smooth"});
+        setTimeout(() => document.querySelector("#chat > .chat-entry:last-child")?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+            inline: 'nearest'
+        }), 100);
         if (form) {
             fetcher.submit(form);
         }
@@ -138,11 +138,11 @@ export default function GenerateChatId({
 
     return (
         <>
-            <div className="w-full h-2/3 pt-12 px-24">
+            <div className="w-full h-2/3 pt-12 px-24 max-[1600px]:px-8">
                 <ChatHistory messages={chatHistory} />
             </div>
             <div className="pb-12 w-full flex flex-col items-center">
-                <fetcher.Form className="md:w-4/5 flex flex-col items-stretch" method="post" encType="multipart/form-data">
+                <fetcher.Form className=" w-[calc(12/13*100%)] flex flex-col items-stretch" method="post" encType="multipart/form-data">
                     <textarea
                         value={prompt}
                         onChange={handleTextareaChange}
