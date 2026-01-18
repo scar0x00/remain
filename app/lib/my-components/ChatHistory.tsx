@@ -9,7 +9,8 @@ interface Message {
 export const ChatHistory: React.FC<{ messages: Message[] }> = ({ messages }) => {
   return (
     <div id="chat"
-      className="flex flex-col gap-4 w-full h-full px-3 overflow-y-auto
+      className="flex flex-col gap-4 w-full h-full px-3 
+      overflow-y-auto
       scrollbar-thin
       scrollbar-track-transparent
       scrollbar-thumb:neutral-700/40
