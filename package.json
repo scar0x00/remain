@@ -9,18 +9,24 @@
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {
+    "@langchain/core": "^1.1.12",
+    "@langchain/langgraph": "^1.0.15",
+    "@langchain/xai": "^1.2.0",
     "@react-router/fs-routes": "^7.12.0",
     "@react-router/node": "7.12.0",
     "@react-router/serve": "7.12.0",
+    "@remix-run/form-data-parser": "^0.14.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "isbot": "^5.1.31",
     "jotai": "^2.16.1",
+    "langchain": "^1.2.7",
     "lucide-react": "^0.562.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-router": "7.12.0",
-    "tailwind-merge": "^3.4.0"
+    "tailwind-merge": "^3.4.0",
+    "zod": "^4.3.5"
   },
   "devDependencies": {
     "@react-router/dev": "7.12.0",
@@ -33,5 +39,6 @@
     "typescript": "^5.9.2",
     "vite": "^7.1.7",
     "vite-tsconfig-paths": "^5.1.4"
-  }
+  },
+  "packageManager": "pnpm@10.28.0+sha512.05df71d1421f21399e053fde567cea34d446fa02c76571441bfc1c7956e98e363088982d940465fd34480d4d90a0668bc12362f8aa88000a64e83d0b0e47be48"
 }
