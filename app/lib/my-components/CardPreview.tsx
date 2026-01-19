@@ -40,7 +40,7 @@ export const CardPreview: React.FC<CardPreviewProps> = ({ cards, previewIndex, o
             <div className="bg-white p-4 rounded-md shadow-md relative max-w-md w-full mx-4 flex flex-col gap-3">
                 <button
                     onClick={onClose}
-                    className="absolute -top-9 left-0 z-10 flex size-7 items-center justify-center rounded-full bg-white/80 shadow-md hover:bg-white transition-colors"
+                    className="absolute -top-9 left-0 z-10 flex size-7 items-center justify-center rounded-full bg-white/80 shadow-md hover:bg-white hover:cursor-pointer transition-colors"
                     aria-label="Close"
                 >
                     <X className="size-4" />

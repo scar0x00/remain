@@ -51,7 +51,7 @@ export default function CardEditor({ card, onClose, onSave }: CardEditorProps) {
                 >
                     <Check className="h-5 w-5" />
                 </button>
-                <div className="relative w-248 max-w-[90vw] h-150 max-h-[90vh] bg-white/90 rounded-xl">
+                <div className="relative w-248 max-w-[90vw] h-150 max-h-[90vh] bg-white/95 rounded-xl">
                     <div className="grid grid-cols-2 grid-rows-2 h-full gap-0">
                         <div className="p-4">
                             <label className="block text-sm font-medium text-gray-700 mb-2">Front</label>

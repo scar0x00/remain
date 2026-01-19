@@ -44,8 +44,8 @@ export default function Generate({ }: Route.ComponentProps) {
             </div>
             <div className="-col-start-2 px-3 pb-2 bg-gray-50 rounded-l-md overflow-y-auto overflow-x-clip scrollbar-thin relative
             ">
-                <div className='sticky top-0 pt-2 inline-flex justify-start items-center hover:cursor-pointer bg-gray-50 w-full' onClick={() => setShowDeckCarousel(true)} >
-                    <h2 className="text-xl mb-4">Deck <ScanEye className='inline size-5 hover:cursor-pointer' /></h2>
+                <div className='sticky top-0 pt-2 inline-flex justify-start items-center bg-gray-50 w-full' onClick={() => setShowDeckCarousel(true)} >
+                    <h2 className="text-xl mb-4 hover:cursor-pointer">Deck <ScanEye className='inline size-5 hover:cursor-pointer' /></h2>
                     {showDeckCarousel && <DeckCarousel cards={deckDraft} onClose={() => setShowDeckCarousel(false)} />}
                 </div>
                 <DeckPreview cards={deckDraft} />
