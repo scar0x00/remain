@@ -1,11 +1,11 @@
-import '~/styles/gruvbox-dark-soft.min.css';
-
 import { useFetcher, Outlet, redirect } from "react-router";
-import { CirclePlus } from "lucide-react";
+import { CirclePlus, ScanEye } from "lucide-react";
 import type { Route } from "./+types/generate";
 import DeckPreview from "~/lib/my-components/DeckPreview";
 import { useAtomValue } from "jotai";
 import { deckDraftAtom } from "~/lib/state/deckDraft";
+import DeckCarousel from '~/lib/my-components/DeckCarousel';
+import { useState } from 'react';
 
 
 export const links: Route.LinksFunction = () => [
@@ -26,6 +26,7 @@ export async function loader({ params }: Route.LoaderArgs) {
 
 export default function Generate({ }: Route.ComponentProps) {
     const deckDraft = useAtomValue(deckDraftAtom);
+    const [showDeckCarousel, setShowDeckCarousel] = useState(false);
     return (
         <div className="grid grid-rows-1 grid-cols-5 h-screen w-screen" id="main-container">
             <div className="col-start-1 flex flex-col justify-start items-stretch px-3 pt-8 bg-gray-50 rounded-r-sm *:mt-3" id="sidebar">
@@ -41,19 +42,12 @@ export default function Generate({ }: Route.ComponentProps) {
             <div className="col-start-2 col-span-3 px-20 max-[1200px]:px-8 flex flex-col justify-between">
                 <Outlet />
             </div>
-            <div className="-col-start-2 px-3 py-2 bg-gray-50 rounded-l-md overflow-y-auto overflow-x-clip
-                scrollbar-thin
-                scrollbar-track-transparent
-                scrollbar-thumb:neutral-700/40
-                hover:scrollbar-thumb:neutral-500/70
-                [&::-webkit-scrollbar]:w-1
-                [&::-webkit-scrollbar-track]:bg-transparent
-                [&::-webkit-scrollbar-thumb]:bg-neutral-600/50
-                [&::-webkit-scrollbar-thumb]:rounded-xl
-                hover:[&::-webkit-scrollbar-thumb]:bg-neutral-500/80
-                transition-colors
+            <div className="-col-start-2 px-3 pb-2 bg-gray-50 rounded-l-md overflow-y-auto overflow-x-clip scrollbar-thin relative
             ">
-                <h2 className="text-xl mb-4">Deck</h2>
+                <div className='sticky top-0 pt-2 inline-flex justify-start items-center hover:cursor-pointer bg-gray-50 w-full' onClick={() => setShowDeckCarousel(true)} >
+                    <h2 className="text-xl mb-4">Deck <ScanEye className='inline size-5 hover:cursor-pointer' /></h2>
+                    {showDeckCarousel && <DeckCarousel cards={deckDraft} onClose={() => setShowDeckCarousel(false)} />}
+                </div>
                 <DeckPreview cards={deckDraft} />
             </div>
         </div>

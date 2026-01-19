@@ -142,7 +142,7 @@ export default function GenerateChatId({
                 <ChatHistory messages={chatHistory} />
             </div>
             <div className="pb-12 w-full flex flex-col items-center">
-                <fetcher.Form className=" w-[calc(12/13*100%)] flex flex-col items-stretch" method="post" encType="multipart/form-data">
+                <fetcher.Form className={`${fetcher.state === 'submitting' && 'animate-pulse'} has-focus:shadow-lg has-focus:scale-[1.01] transition-all rounded-md ease-in-out duration-200 w-[calc(12/13*100%)] flex flex-col items-stretch focus:border-gray-400 focus:border-2 focus:border-solid`} method="post" encType="multipart/form-data">
                     <textarea
                         value={prompt}
                         onChange={handleTextareaChange}

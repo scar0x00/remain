@@ -1,3 +1,4 @@
+import DOMPurify  from "dompurify";
 import markdownit from 'markdown-it';
 import hljs from 'highlight.js'
 import { katex } from "@mdit/plugin-katex";
@@ -25,7 +26,7 @@ class MarkdownRenderer {
 
 
     render(markdown: string): string {
-        return this.md.render(markdown);
+        return DOMPurify.sanitize(this.md.render(markdown));
     }
 }
 
