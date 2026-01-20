@@ -1,2 +1,8 @@
+packages:
+  - .
+  - api/*
+
 onlyBuiltDependencies:
   - esbuild
+  - sharp
+  - workerd

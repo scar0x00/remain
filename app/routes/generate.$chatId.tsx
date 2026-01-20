@@ -1,7 +1,3 @@
-// import {
-//     type FileUpload,
-//     parseFormData,
-// } from "@remix-run/form-data-parser";
 import { useFetcher } from "react-router";
 import { Paperclip, SendHorizontal, File } from "lucide-react";
 import type { Route } from "./+types/generate.$chatId";
@@ -11,6 +7,8 @@ import { useAtom } from "jotai";
 import React, { useCallback, useEffect, useRef, useState, type ChangeEvent } from "react";
 import { getAgentCompletion } from "~/lib/agents/deckGenerationAgent";
 import { deckDraftAtom } from "~/lib/state/deckDraft";
+
+
 
 export async function action({
     request,

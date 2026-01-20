@@ -5,6 +5,7 @@ import { MemorySaver } from "@langchain/langgraph";
 import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
+// import { agentLoggingMiddleware } from "./middleware/loggingMiddleware";
 
 console.log(import.meta.url);
 console.log(process.argv[1]);
@@ -43,6 +44,7 @@ export async function getAgentCompletion({
   const config = {
     configurable: { thread_id: threadId },
     context: { user_id: userId },
+    // callbacks: [agentLoggingMiddleware]
   };
 
   const response = await deckGenerationAgent.invoke(

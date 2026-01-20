@@ -4,5 +4,14 @@ import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
+  server: {
+    proxy: {
+      "/api/v1": {
+        target: "http://localhost:8787",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/v1/, ""),
+      },
+    },
+  },
   plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
 });

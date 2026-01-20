@@ -52,7 +52,7 @@ const DeckPreview: React.FC<DeckPreviewProps> = ({ cards }) => {
     <div className="flex flex-col justify-center items-center">
       <CardPreview cards={cards} previewIndex={previewCard} onClose={() => setPreviewCard(null)} />
       {cards.map((card, index) => (
-        <div key={index} className="mb-2 bg-gray-100 text-gray-700 p-2 text-xs w-full rounded-md grid grid-cols-5 grid-rows-[2] gap-3">
+        <div key={index} className="mb-2 bg-linear-to-bl from-gray-100 to-gray-50 text-gray-700 p-2 text-xs w-full rounded-md grid grid-cols-5 grid-rows-[2] gap-3">
           <div className="col-span-3 col-start-3 row-start-1 justify-end inline-flex gap-2">
             <Trash size={14} className="text-gray-400 hover:cursor-pointer hover:text-gray-600" onClick={() => setDraftDeck(deck => {
               return deck.filter((_, i) => i !== index);
