@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+// import { cors } from "hono/cors";
 import { R2Bucket } from "@cloudflare/workers-types";
 
 type Bindings = {
@@ -8,11 +9,14 @@ type Bindings = {
 const deck = new Hono<{ Bindings: Bindings }>();
 const app = new Hono<{ Bindings: Bindings }>();
 
+// app.use("*", cors());
+
 deck.get("/:deckid", async (c) => {
   const object = await c.env.DECK_BUCKET.get(c.req.param("deckid"));
   const content = await object?.json();
   if (content !== undefined) return c.json(content);
 
+  return c.json([]);
 
 }).put(async (c) => {
   const body = await c.req.text();

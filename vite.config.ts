@@ -14,4 +14,11 @@ export default defineConfig({
     },
   },
   plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
+  ssr: {
+    noExternal: [],
+    external: ['better-sqlite3', "@langchain/langgraph-checkpoint-sqlite"],
+  },
+  optimizeDeps: {
+    exclude: ['better-sqlite3']
+  }
 });

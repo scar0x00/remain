@@ -1,13 +1,47 @@
-import { useFetcher } from "react-router";
+import { useFetcher, type ShouldRevalidateFunctionArgs } from "react-router";
 import { Paperclip, SendHorizontal, File } from "lucide-react";
 import type { Route } from "./+types/generate.$chatId";
 import { ChatHistory } from "~/lib/my-components/ChatHistory";
 import { chatHistoryAtom } from "~/lib/state/chatHistory";
 import { useAtom } from "jotai";
+import { useHydrateAtoms } from 'jotai/utils';
 import React, { useCallback, useEffect, useRef, useState, type ChangeEvent } from "react";
-import { getAgentCompletion } from "~/lib/agents/deckGenerationAgent";
+import { getAgentCompletion, getChatHistory } from "~/lib/agents/deckGenerationAgent";
 import { deckDraftAtom } from "~/lib/state/deckDraft";
+import { getDeckById } from "~/lib/utils/getDeckById";
 
+export async function loader({
+    params
+}: Route.LoaderArgs) {
+    const chatHistory = await getChatHistory(params.chatId);
+    const deck = await getDeckById(params.chatId);
+
+    return {
+        chatHistory,
+        deck
+    };
+}
+export function shouldRevalidate({
+    actionResult,
+    defaultShouldRevalidate,
+    formAction,
+    currentUrl
+}: ShouldRevalidateFunctionArgs) {
+    // 1. Define the path for this route
+    const currentPath = currentUrl.pathname;
+
+    // 2. Skip revalidation if the action was sent to this route
+    if (formAction === currentPath) {
+        return false;
+    }
+
+    if (actionResult) {
+        return false;
+    }
+
+    // 3. Otherwise, use the default behavior (e.g., for navigation)
+    return defaultShouldRevalidate;
+}
 
 
 export async function action({
@@ -50,6 +84,12 @@ export default function GenerateChatId({
     loaderData,
     params
 }: Route.ComponentProps) {
+    useHydrateAtoms([
+        [chatHistoryAtom, loaderData.chatHistory || []]
+    ]);
+    useHydrateAtoms([
+        [deckDraftAtom, loaderData.deck || []]
+    ]);
     const [prompt, setPrompt] = useState("");
     const [fileName, setFileName] = useState("");
     const [chatHistory, setChatHistory] = useAtom(chatHistoryAtom);
@@ -58,6 +98,7 @@ export default function GenerateChatId({
     const fetcher = useFetcher();
 
     useEffect(() => {
+        console.log(chatHistory);
         if (fetcher.data !== undefined) {
             if (fileInputRef.current !== null) {
                 fileInputRef.current.value = '';

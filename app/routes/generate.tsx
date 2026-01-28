@@ -6,6 +6,7 @@ import { useAtomValue } from "jotai";
 import { deckDraftAtom } from "~/lib/state/deckDraft";
 import DeckCarousel from '~/lib/my-components/DeckCarousel';
 import { useState } from 'react';
+import { useHydrateAtoms } from "jotai/utils";
 
 
 export const links: Route.LinksFunction = () => [
@@ -21,10 +22,18 @@ export async function loader({ params }: Route.LoaderArgs) {
     if (params.chatId === undefined) {
         return redirect(`/generate/${crypto.randomUUID()}`)
     }
-    return {};
+    return {
+        // deck: []
+    };
 }
 
-export default function Generate({ params }: Route.ComponentProps) {
+export default function Generate({ 
+    params,
+    loaderData
+}: Route.ComponentProps) {
+    // useHydrateAtoms([
+    //     [deckDraftAtom, loaderData.deck || []]
+    // ]);
     const deckDraft = useAtomValue(deckDraftAtom);
     const [showDeckCarousel, setShowDeckCarousel] = useState(false);
     return (
@@ -42,12 +51,11 @@ export default function Generate({ params }: Route.ComponentProps) {
             <div className="col-start-2 col-span-3 px-20 max-[1200px]:px-8 flex flex-col justify-between">
                 <Outlet />
             </div>
-            <div className="-col-start-2 px-3 pb-2 bg-gray-50 rounded-l-md overflow-y-auto overflow-x-clip scrollbar-thin relative
-            ">
+            <div className="-col-start-2 px-3 pb-2 bg-gray-50 rounded-l-md overflow-y-auto overflow-x-clip scrollbar-thin relative">
                 <div className='sticky top-0 py-4 inline-flex justify-start items-center bg-gray-50 w-full' >
                     <h2 className="text-xl hover:cursor-pointer" onClick={() => setShowDeckCarousel(true)}>Deck <ScanEye className='inline size-6 hover:cursor-pointer text-gray-600' /></h2>
                     <div className="flex justify-center items-center ml-auto h-full">
-                        <Save className='inline size-6 hover:cursor-pointer text-gray-600' onClick={async () => 
+                        <Save className='inline size-6 hover:cursor-pointer text-gray-600' onClick={async () =>
                             await fetch(`/api/v1/deck/${params.chatId}`, {
                                 method: "PUT",
                                 body: JSON.stringify(deckDraft),
@@ -55,7 +63,7 @@ export default function Generate({ params }: Route.ComponentProps) {
                                     'Content-Type': 'application/json'
                                 }
                             })
-                        }/>
+                        } />
                     </div>
                 </div>
                 {showDeckCarousel && <DeckCarousel cards={deckDraft} onClose={() => setShowDeckCarousel(false)} />}
