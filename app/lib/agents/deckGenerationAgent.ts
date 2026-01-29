@@ -19,7 +19,7 @@ const SYSTEM_PROMPT = readFileSync(
 
 // const checkpointer = new MemorySaver();
 const checkpointer = SqliteSaver.fromConnString(
-  `${__dirname}/chats/chat_history.db`,
+  `/home/oscar/Repos/remain/app/lib/agents/chats/chat_history.db`,
 );
 
 const responseFormat = z.object({

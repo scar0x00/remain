@@ -1,12 +1,12 @@
 import { useFetcher, Outlet, redirect } from "react-router";
-import { CirclePlus, Save, ScanEye } from "lucide-react";
+import { BookA, CirclePlus, Pen, Save, ScanEye } from "lucide-react";
 import type { Route } from "./+types/generate";
 import DeckPreview from "~/lib/my-components/DeckPreview";
 import { useAtomValue } from "jotai";
 import { deckDraftAtom } from "~/lib/state/deckDraft";
 import DeckCarousel from '~/lib/my-components/DeckCarousel';
-import { useState } from 'react';
-import { useHydrateAtoms } from "jotai/utils";
+import { useRef, useState } from 'react';
+import ToastNotification from "~/lib/my-components/ToastNotification";
 
 
 export const links: Route.LinksFunction = () => [
@@ -27,20 +27,19 @@ export async function loader({ params }: Route.LoaderArgs) {
     };
 }
 
-export default function Generate({ 
+export default function Generate({
     params,
     loaderData
 }: Route.ComponentProps) {
-    // useHydrateAtoms([
-    //     [deckDraftAtom, loaderData.deck || []]
-    // ]);
     const deckDraft = useAtomValue(deckDraftAtom);
     const [showDeckCarousel, setShowDeckCarousel] = useState(false);
+    const [showToast, setShowToast] = useState(false);
+
     return (
         <div className="grid grid-rows-1 grid-cols-5 h-screen w-screen" id="main-container">
             <div className="col-start-1 flex flex-col justify-start items-stretch px-3 pt-8 bg-gray-50 rounded-r-sm *:mt-3" id="sidebar">
                 <h1 className="self-start text-xl">Remain</h1>
-                <div className="">
+                <div className="" id="new-chat-button">
                     <a href="/generate">
                         <button className="p-2 text-sm text-gray-600 hover:cursor-pointer hover:text-black rounded-md bg-gray-200">
                             New chat &nbsp;<CirclePlus className="inline" size={20} />
@@ -49,13 +48,22 @@ export default function Generate({
                 </div>
             </div>
             <div className="col-start-2 col-span-3 px-20 max-[1200px]:px-8 flex flex-col justify-between">
+                <div className="mt-2 flex items-center">
+                    <BookA className="mr-2 size-6 text-gray-300 has-[+_:focus]:text-gray-500"></BookA>
+                    <h1 className={`
+                    text-xl place-self-stretch flex-1 border-2 p-3 rounded-md border-transparent`}>
+                        Title
+                    </h1>
+                </div>
                 <Outlet />
             </div>
             <div className="-col-start-2 px-3 pb-2 bg-gray-50 rounded-l-md overflow-y-auto overflow-x-clip scrollbar-thin relative">
                 <div className='sticky top-0 py-4 inline-flex justify-start items-center bg-gray-50 w-full' >
                     <h2 className="text-xl hover:cursor-pointer" onClick={() => setShowDeckCarousel(true)}>Deck <ScanEye className='inline size-6 hover:cursor-pointer text-gray-600' /></h2>
                     <div className="flex justify-center items-center ml-auto h-full">
-                        <Save className='inline size-6 hover:cursor-pointer text-gray-600' onClick={async () =>
+                        {showToast && <ToastNotification message="Deck saved" isVisible={showToast} onClose={() => setShowToast(false)} />}
+                        <Save className='inline size-6 hover:cursor-pointer text-gray-600' onClick={async () => {
+                            setShowToast(true);
                             await fetch(`/api/v1/deck/${params.chatId}`, {
                                 method: "PUT",
                                 body: JSON.stringify(deckDraft),
@@ -63,6 +71,7 @@ export default function Generate({
                                     'Content-Type': 'application/json'
                                 }
                             })
+                        }
                         } />
                     </div>
                 </div>

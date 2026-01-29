@@ -60,10 +60,10 @@ export default function DeckCarousel({ cards, onClose }: DeckCarouselProps) {
                             className="min-h-[25vh] w-full snap-start flex flex-col items-center justify-center p-8 gap-3"
                         >
                             <div className="text-center">
-                                <p className="text-lg" dangerouslySetInnerHTML={{ __html: mdRenderer.render(card.front) }}></p>
+                                <div className="text-lg" dangerouslySetInnerHTML={{ __html: mdRenderer.render(card.front) }}></div>
                             </div>
                             <div className="text-center border-t pt-4 overflow-x-auto max-w-full scrollbar-thin">
-                                <p className="text-md text-gray-700" dangerouslySetInnerHTML={{ __html: mdRenderer.render(card.back) }}></p>
+                                <div className="text-md text-gray-700" dangerouslySetInnerHTML={{ __html: mdRenderer.render(card.back) }}></div>
                             </div>
                         </div>
                     ))}

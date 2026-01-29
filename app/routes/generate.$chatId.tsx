@@ -27,10 +27,8 @@ export function shouldRevalidate({
     formAction,
     currentUrl
 }: ShouldRevalidateFunctionArgs) {
-    // 1. Define the path for this route
     const currentPath = currentUrl.pathname;
 
-    // 2. Skip revalidation if the action was sent to this route
     if (formAction === currentPath) {
         return false;
     }
@@ -39,7 +37,6 @@ export function shouldRevalidate({
         return false;
     }
 
-    // 3. Otherwise, use the default behavior (e.g., for navigation)
     return defaultShouldRevalidate;
 }
 
