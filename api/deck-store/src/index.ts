@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-// import { cors } from "hono/cors";
+import { cors } from "hono/cors";
 import { R2Bucket } from "@cloudflare/workers-types";
 
 type Bindings = {
@@ -9,7 +9,7 @@ type Bindings = {
 const deck = new Hono<{ Bindings: Bindings }>();
 const app = new Hono<{ Bindings: Bindings }>();
 
-// app.use("*", cors());
+app.use("*", cors());
 
 deck.get("/:deckid", async (c) => {
   const object = await c.env.DECK_BUCKET.get(c.req.param("deckid"));
@@ -19,7 +19,7 @@ deck.get("/:deckid", async (c) => {
   return c.json([]);
 
 }).put(async (c) => {
-  const body = await c.req.text();
+  const body = await c.req.json();
 
   if (body == "") {
     c.status(400);
@@ -30,7 +30,12 @@ deck.get("/:deckid", async (c) => {
 
   await c.env.DECK_BUCKET.put(
     c.req.param("deckid"),
-    body,
+    JSON.stringify(body),
+    {
+      customMetadata: {
+        title: body.title
+      }
+    }
   );
 
   return c.json({
@@ -52,13 +57,10 @@ deck.get("/:deckid", async (c) => {
   }
 });
 
-
-
-app.route("deck", deck);
-
 app.get("/decks", async (c) => {
   const decks = await c.env.DECK_BUCKET.list({
     limit: 15,
+    include: ['customMetadata']
   });
 
   return c.json({
@@ -66,5 +68,10 @@ app.get("/decks", async (c) => {
     decks: decks.objects
   });
 });
+
+
+app.route("deck", deck);
+app.route("api/v1/deck", deck);
+
 
 export default app;

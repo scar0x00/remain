@@ -3,42 +3,11 @@ import { Paperclip, SendHorizontal, File } from "lucide-react";
 import type { Route } from "./+types/generate.$chatId";
 import { ChatHistory } from "~/lib/my-components/ChatHistory";
 import { chatHistoryAtom } from "~/lib/state/chatHistory";
-import { useAtom } from "jotai";
-import { useHydrateAtoms } from 'jotai/utils';
-import React, { useCallback, useEffect, useRef, useState, type ChangeEvent } from "react";
-import { getAgentCompletion, getChatHistory } from "~/lib/agents/deckGenerationAgent";
+import { useAtom, useSetAtom } from "jotai";
+import { useCallback, useEffect, useRef, useState, type ChangeEvent } from "react";
+import { getAgentCompletion } from "~/lib/agents/deckGenerationAgent";
 import { deckDraftAtom } from "~/lib/state/deckDraft";
-import { getDeckById } from "~/lib/utils/getDeckById";
 
-export async function loader({
-    params
-}: Route.LoaderArgs) {
-    const chatHistory = await getChatHistory(params.chatId);
-    const deck = await getDeckById(params.chatId);
-
-    return {
-        chatHistory,
-        deck
-    };
-}
-export function shouldRevalidate({
-    actionResult,
-    defaultShouldRevalidate,
-    formAction,
-    currentUrl
-}: ShouldRevalidateFunctionArgs) {
-    const currentPath = currentUrl.pathname;
-
-    if (formAction === currentPath) {
-        return false;
-    }
-
-    if (actionResult) {
-        return false;
-    }
-
-    return defaultShouldRevalidate;
-}
 
 
 export async function action({
@@ -81,21 +50,15 @@ export default function GenerateChatId({
     loaderData,
     params
 }: Route.ComponentProps) {
-    useHydrateAtoms([
-        [chatHistoryAtom, loaderData.chatHistory || []]
-    ]);
-    useHydrateAtoms([
-        [deckDraftAtom, loaderData.deck || []]
-    ]);
     const [prompt, setPrompt] = useState("");
     const [fileName, setFileName] = useState("");
     const [chatHistory, setChatHistory] = useAtom(chatHistoryAtom);
-    const [deckDraft, setDeckDraft] = useAtom(deckDraftAtom);
+    const setDeckDraft = useSetAtom(deckDraftAtom);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const fetcher = useFetcher();
 
     useEffect(() => {
-        console.log(chatHistory);
+        // console.log(chatHistory);
         if (fetcher.data !== undefined) {
             if (fileInputRef.current !== null) {
                 fileInputRef.current.value = '';
@@ -104,16 +67,25 @@ export default function GenerateChatId({
                 if (fetcher.data.content.action === "add_to_deck") {
                     setDeckDraft((deck) => {
                         if (deck) {
-                            return [
-                                ...deck,
-                                ...fetcher.data.content.deck
-                            ];
+                            return {
+                                title: deck.title,
+                                cards: [
+                                    ...deck.cards,
+                                    ...fetcher.data.content.deck
+                                ]
+                            };
                         } else {
-                            return fetcher.data.content.deck;
+                            return {
+                                title: "",
+                                cards: fetcher.data.content.deck
+                            };
                         }
                     });
                 } else if (fetcher.data.content.action === "replace_deck") {
-                    setDeckDraft(fetcher.data.content.deck);
+                    setDeckDraft((deck) => ({
+                        title: deck?.title || "",
+                        cards: fetcher.data.content.deck
+                    }));
                 }
             }
             setPrompt("");
@@ -135,7 +107,6 @@ export default function GenerateChatId({
 
     const onFileChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         if (e.currentTarget.files === null) return;
-        console.log(e.currentTarget?.files[0].name);
         setFileName(e.currentTarget?.files[0].name);
     }, [fileName]);
 
@@ -174,7 +145,7 @@ export default function GenerateChatId({
 
     return (
         <>
-            <div className="w-full h-2/3 pt-12 px-24 max-[1600px]:px-8">
+            <div className="w-full h-2/3 pt-1 px-24 max-[1600px]:px-8">
                 <ChatHistory messages={chatHistory} />
             </div>
             <div className="pb-12 w-full flex flex-col items-center">

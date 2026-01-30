@@ -1,16 +1,9 @@
-'use client';
-
 import { useEffect, useMemo, useRef } from "react";
 import { X } from "lucide-react";
 import { MarkdownRenderer } from "~/lib/utils/MarkdownRenderer";
 
-interface Card {
-    front: string;
-    back: string;
-}
-
 interface DeckCarouselProps {
-    cards: Card[];
+    cards: Flashcard[];
     onClose: () => void;
 }
 

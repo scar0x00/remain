@@ -1,11 +1,6 @@
 import clsx from 'clsx';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { MarkdownRenderer } from '../utils/MarkdownRenderer';
-
-interface Message {
-  role: "agent" | "user";
-  content: string;
-}
 
 export const MessageEntry: React.FC<{ message: Message }> = ({ message }) => {
 

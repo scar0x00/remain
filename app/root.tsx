@@ -6,7 +6,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
-import { getDefaultStore, Provider } from 'jotai'
+import { Provider } from 'jotai'
 
 import type { Route } from "./+types/root";
 import "./app.css";
@@ -34,7 +34,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <Provider store={getDefaultStore()}>
+        <Provider>
           {children}
         </Provider>
 

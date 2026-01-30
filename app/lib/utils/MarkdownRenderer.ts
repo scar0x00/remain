@@ -1,4 +1,4 @@
-import DOMPurify  from "dompurify";
+import DOMPurify from "isomorphic-dompurify";
 import markdownit from 'markdown-it';
 import hljs from 'highlight.js'
 import { katex } from "@mdit/plugin-katex";

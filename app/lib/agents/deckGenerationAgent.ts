@@ -1,12 +1,10 @@
 import { llm } from "~/lib/agents/models/Grok4.1Fast";
 import * as z from "zod";
-import { createAgent, tool } from "langchain";
-// import { MemorySaver } from "@langchain/langgraph";
+import { createAgent } from "langchain";
 import { SqliteSaver } from "@langchain/langgraph-checkpoint-sqlite";
 import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
-// import { agentLoggingMiddleware } from "./middleware/loggingMiddleware";
 
 console.log(import.meta.url);
 console.log(process.argv[1]);
@@ -17,7 +15,6 @@ const SYSTEM_PROMPT = readFileSync(
   "utf-8",
 );
 
-// const checkpointer = new MemorySaver();
 const checkpointer = SqliteSaver.fromConnString(
   `/home/oscar/Repos/remain/app/lib/agents/chats/chat_history.db`,
 );

@@ -2,13 +2,8 @@ import { X } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { MarkdownRenderer } from "~/lib/utils/MarkdownRenderer";
 
-interface Card {
-    front: string;
-    back: string;
-}
-
 interface CardPreviewProps {
-    cards: Card[];
+    cards: Flashcard[];
     previewIndex: number | null;
     onClose: () => void;
 }

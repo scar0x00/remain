@@ -7,3 +7,4 @@
 /build/
 
 .opencode/
+.prod_env

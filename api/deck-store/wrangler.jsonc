@@ -18,7 +18,7 @@
   "r2_buckets": [
     {
       "binding": "DECK_BUCKET",
-      "bucket_name": "remain-decks"
+      "bucket_name": "remain-decks",
     }
   ],
   // "d1_databases": [

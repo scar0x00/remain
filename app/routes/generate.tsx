@@ -1,13 +1,20 @@
-import { useFetcher, Outlet, redirect } from "react-router";
-import { BookA, CirclePlus, Pen, Save, ScanEye } from "lucide-react";
+import { Outlet, redirect, type ShouldRevalidateFunctionArgs } from "react-router";
+import { BookA, CirclePlus, Save, ScanEye } from "lucide-react";
 import type { Route } from "./+types/generate";
 import DeckPreview from "~/lib/my-components/DeckPreview";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { deckDraftAtom } from "~/lib/state/deckDraft";
 import DeckCarousel from '~/lib/my-components/DeckCarousel';
-import { useRef, useState } from 'react';
+import { useCallback, useEffect, useState, type ChangeEvent } from 'react';
 import ToastNotification from "~/lib/my-components/ToastNotification";
+import { getDeckById } from "~/lib/utils/getDeckById";
+import { getChatHistory } from "~/lib/agents/deckGenerationAgent";
+import { useHydrateAtoms } from "jotai/utils";
+import { chatHistoryAtom } from "~/lib/state/chatHistory";
+import { SavedDecks } from "~/lib/my-components/SavedDecks";
 
+
+const API_BASE = process.env.API_BASE_URL || '';
 
 export const links: Route.LinksFunction = () => [
     {
@@ -22,18 +29,75 @@ export async function loader({ params }: Route.LoaderArgs) {
     if (params.chatId === undefined) {
         return redirect(`/generate/${crypto.randomUUID()}`)
     }
+
+    const chatHistory = await getChatHistory(params.chatId);
+    const deck = await getDeckById(params.chatId);
+
+    const savedDecks = (
+        await (await fetch(`${API_BASE}/api/v1/decks`)).json()
+    ).decks.filter((deck: any) =>
+        !!(deck?.customMetadata?.title)
+    )?.map((deck: any) => ({
+        title: deck.customMetadata.title,
+        id: deck.key,
+        url: `/generate/${deck.key}`
+    }));
+
+
     return {
-        // deck: []
+        chatHistory,
+        deck,
+        apiHost: API_BASE,
+        savedDecks
     };
+}
+
+export function shouldRevalidate({
+    actionResult,
+    defaultShouldRevalidate,
+    formAction,
+    currentUrl
+}: ShouldRevalidateFunctionArgs) {
+    const currentPath = currentUrl.pathname;
+
+    // console.log(currentPath, formAction);
+
+    if (formAction === currentPath) {
+        return false;
+    }
+
+    // console.log(actionResult);
+    if (actionResult) {
+        return false;
+    }
+
+    // console.log(defaultShouldRevalidate);
+
+    return defaultShouldRevalidate;
 }
 
 export default function Generate({
     params,
     loaderData
 }: Route.ComponentProps) {
+    // console.log("loader", loaderData);
+    useHydrateAtoms([
+        [chatHistoryAtom, loaderData.chatHistory || []],
+        [deckDraftAtom, loaderData.deck || []]
+    ]);
     const deckDraft = useAtomValue(deckDraftAtom);
+    // console.log("deckdraft", deckDraft);
+    const setDeckDraft = useSetAtom(deckDraftAtom);
     const [showDeckCarousel, setShowDeckCarousel] = useState(false);
     const [showToast, setShowToast] = useState(false);
+    const [title, setTitle] = useState<string>(deckDraft?.title || "");
+    const handleTitleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        setTitle(e.target.value);
+    }, []);
+
+    useEffect(() => {
+        setDeckDraft(deck => ({ ...deck, title }));
+    }, [title, setDeckDraft]);
 
     return (
         <div className="grid grid-rows-1 grid-cols-5 h-screen w-screen" id="main-container">
@@ -46,14 +110,18 @@ export default function Generate({
                         </button>
                     </a>
                 </div>
+                <SavedDecks savedDecks={loaderData.savedDecks} />
             </div>
             <div className="col-start-2 col-span-3 px-20 max-[1200px]:px-8 flex flex-col justify-between">
-                <div className="mt-2 flex items-center">
+                <div className="mt-2 flex items-center mx-16">
                     <BookA className="mr-2 size-6 text-gray-300 has-[+_:focus]:text-gray-500"></BookA>
-                    <h1 className={`
-                    text-xl place-self-stretch flex-1 border-2 p-3 rounded-md border-transparent`}>
-                        Title
-                    </h1>
+                    <input id="deck-title" className={`
+                        text-xl place-self-stretch flex-1 border-2 py-1 px-2 rounded-md border-transparent transition-colors mr-16
+                        focus:outline-none focus:border-gray-300`}
+                        placeholder="Set title..."
+                        value={title}
+                        onChange={handleTitleChange}
+                    />
                 </div>
                 <Outlet />
             </div>
@@ -64,9 +132,12 @@ export default function Generate({
                         {showToast && <ToastNotification message="Deck saved" isVisible={showToast} onClose={() => setShowToast(false)} />}
                         <Save className='inline size-6 hover:cursor-pointer text-gray-600' onClick={async () => {
                             setShowToast(true);
-                            await fetch(`/api/v1/deck/${params.chatId}`, {
+                            await fetch(`${loaderData.apiHost}/api/v1/deck/${params.chatId}`, {
                                 method: "PUT",
-                                body: JSON.stringify(deckDraft),
+                                body: JSON.stringify({
+                                    title,
+                                    cards: deckDraft.cards
+                                }),
                                 headers: {
                                     'Content-Type': 'application/json'
                                 }
@@ -75,8 +146,8 @@ export default function Generate({
                         } />
                     </div>
                 </div>
-                {showDeckCarousel && <DeckCarousel cards={deckDraft} onClose={() => setShowDeckCarousel(false)} />}
-                <DeckPreview cards={deckDraft} />
+                {showDeckCarousel && <DeckCarousel cards={deckDraft.cards} onClose={() => setShowDeckCarousel(false)} />}
+                <DeckPreview cards={deckDraft.cards} />
             </div>
         </div>
     );

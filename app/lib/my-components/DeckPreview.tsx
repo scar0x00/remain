@@ -1,19 +1,15 @@
 import { useAtom, useSetAtom } from 'jotai';
 import { Eye, Pencil, Trash } from 'lucide-react';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { CardPreview } from '~/lib/my-components/CardPreview';
 import { deckDraftAtom } from '~/lib/state/deckDraft';
 import { MarkdownRenderer } from '~/lib/utils/MarkdownRenderer';
 import CardEditor from '~/lib/my-components/CardEditor';
 import '~/styles/gruvbox-dark-soft.min.css';
 
-interface Card {
-  front: string;
-  back: string;
-}
 
 interface DeckPreviewProps {
-  cards: Card[];
+  cards: Flashcard[];
 }
 
 const DeckPreview: React.FC<DeckPreviewProps> = ({ cards }) => {
@@ -40,7 +36,7 @@ const DeckPreview: React.FC<DeckPreviewProps> = ({ cards }) => {
       if (e.key === "ArrowLeft") {
         setPreviewCard(i => i === null ? i : Math.max(i - 1, 0));
       } else if (e.key === "ArrowRight") {
-        setPreviewCard(i => i === null ? i : Math.min(i + 1, draftDeck.length - 1));
+        setPreviewCard(i => i === null ? i : Math.min(i + 1, draftDeck.cards.length - 1));
       }
     };
 
@@ -55,11 +51,11 @@ const DeckPreview: React.FC<DeckPreviewProps> = ({ cards }) => {
         <div key={index} className="mb-2 bg-linear-to-bl from-gray-100 to-gray-50 text-gray-700 p-2 text-xs w-full rounded-md grid grid-cols-5 grid-rows-[2] gap-3">
           <div className="col-span-3 col-start-3 row-start-1 justify-end inline-flex gap-2">
             <Trash size={14} className="text-gray-400 hover:cursor-pointer hover:text-gray-600" onClick={() => setDraftDeck(deck => {
-              return deck.filter((_, i) => i !== index);
+              return { ...deck, cards: deck.cards.filter((_, i) => i !== index) };
             })} />
             <Pencil size={14} className="text-gray-400 hover:cursor-pointer hover:text-gray-600" onClick={() => setShowCardEditor(index)} />
             {showCardEditor === index && <CardEditor card={card} onClose={() => setShowCardEditor(null)} onSave={(card) => {
-                setDeckDraft((deck) => deck.map((item, i) => index == i ? card : item));
+                setDeckDraft((deck) => ({ ...deck, cards: deck.cards.map((item, i) => index === i ? card : item) }));
                 setShowCardEditor(null);
             }} />}
             <Eye size={14} className="text-gray-400 hover:cursor-pointer hover:text-gray-600" onClick={() => setPreviewCard(index)} />

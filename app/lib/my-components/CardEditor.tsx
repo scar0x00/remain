@@ -3,15 +3,11 @@ import { X, Check } from "lucide-react";
 import { MarkdownRenderer } from "~/lib/utils/MarkdownRenderer";
 import '~/styles/gruvbox-dark-soft.min.css';
 
-interface Card {
-    front: string;
-    back: string;
-}
 
 interface CardEditorProps {
-    card?: Card;
+    card?: Flashcard;
     onClose: () => void;
-    onSave: (card: Card) => void;
+    onSave: (card: Flashcard) => void;
 }
 
 export default function CardEditor({ card, onClose, onSave }: CardEditorProps) {
