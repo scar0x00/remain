@@ -5,3 +5,8 @@
 # React Router
 /.react-router/
 /build/
+
+.opencode/
+.prod_env
+
+**/*.db*

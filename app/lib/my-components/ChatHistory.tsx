@@ -1,12 +1,6 @@
-import React from 'react';
 import MessageEntry from "~/lib/my-components/MessageEntry";
 
-interface Message {
-  role: "agent" | "user";
-  content: string;
-}
-
-export const ChatHistory: React.FC<{ messages: Message[] }> = ({ messages }) => {
+export const ChatHistory = ({ messages } : { messages: Message[] }) => {
   return (
     <div id="chat"
       className="flex flex-col gap-4 w-full h-full px-3 
