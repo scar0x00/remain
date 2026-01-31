@@ -21,6 +21,7 @@
     "@react-router/serve": "7.12.0",
     "@remix-run/form-data-parser": "^0.14.0",
     "@types/jsdom": "^27.0.0",
+    "@uidotdev/usehooks": "^2.4.1",
     "better-sqlite3": "^12.6.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
