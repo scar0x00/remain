@@ -1,5 +1,6 @@
 import { Search } from "lucide-react";
 import { useCallback, useState } from "react";
+import { useDebounce } from '@uidotdev/usehooks';
 import { SavedDecks } from "~/lib/my-components/SavedDecks";
 
 
@@ -11,6 +12,7 @@ interface SavedDecksProps {
 
 export function SearchbleSavedDecks({ savedDecks }: SavedDecksProps) {
     const [searchTerm, setSearchTerm] = useState("");
+    const debouncedSearchTerm = useDebounce(searchTerm, 300);
     const handleOnChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
     }, [setSearchTerm])
@@ -23,7 +25,7 @@ export function SearchbleSavedDecks({ savedDecks }: SavedDecksProps) {
                 `} onChange={handleOnChange} />
                 <Search className="text-gray-400" />
             </div>
-            <SavedDecks savedDecks={savedDecks?.filter(item => item.title.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()))} />
+            <SavedDecks savedDecks={savedDecks?.filter(item => item.title.toLocaleLowerCase().includes(debouncedSearchTerm.toLocaleLowerCase()))} />
         </>
     )
 }
