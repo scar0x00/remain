@@ -16,5 +16,6 @@ interface Message {
 interface SavedDeck {
   title: string;
   url: string
-  id: string
+  id: string,
+  uploaded: string
 }

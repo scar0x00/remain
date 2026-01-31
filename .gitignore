@@ -8,3 +8,5 @@
 
 .opencode/
 .prod_env
+
+**/*.db*
