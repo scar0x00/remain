@@ -41,7 +41,8 @@ export async function loader({ params }: Route.LoaderArgs) {
     )?.map((deck: any) => ({
         title: deck.customMetadata.title,
         id: deck.key,
-        url: `/generate/${deck.key}`
+        url: `/generate/${deck.key}`,
+        uploaded: new Date(deck.uploaded),
     }));
 
 
@@ -107,7 +108,7 @@ export default function Generate({
 
     return (
         <div className="grid grid-rows-1 grid-cols-5 h-screen w-screen" id="main-container">
-            <div className="col-start-1 flex flex-col justify-start px-3 pt-8 bg-gray-50 rounded-r-sm *:mt-3" id="sidebar">
+            <div className="col-start-1 flex flex-col justify-start px-3 pt-8 bg-gray-50 *:mt-3" id="sidebar">
                 <h1 className="self-start text-xl">Remain</h1>
                 <div className="" id="new-chat-button">
                     <a href="/generate">
@@ -131,7 +132,7 @@ export default function Generate({
                 </div>
                 <Outlet />
             </div>
-            <div className="-col-start-2 px-3 pb-2 bg-gray-50 rounded-l-md overflow-y-auto overflow-x-clip scrollbar-thin relative">
+            <div className="-col-start-2 px-3 pb-2 bg-gray-50 overflow-y-auto overflow-x-clip scrollbar-thin relative">
                 <div className='sticky top-0 py-4 inline-flex justify-start items-center bg-gray-50 w-full' >
                     <h2 className="text-xl hover:cursor-pointer" onClick={() => setShowDeckCarousel(true)}>Deck <ScanEye className='inline size-6 hover:cursor-pointer text-gray-600' /></h2>
                     <div className="flex justify-center items-center ml-auto h-full">
