@@ -55,7 +55,7 @@ export default function DeckCarousel({ cards, onClose }: DeckCarouselProps) {
                             <div className="text-center">
                                 <div className="text-lg" dangerouslySetInnerHTML={{ __html: mdRenderer.render(card.front) }}></div>
                             </div>
-                            <div className="text-center border-t pt-4 overflow-x-auto max-w-full scrollbar-thin">
+                            <div className="text-center border-t pt-4 overflow-x-auto overflow-hidden max-w-full scrollbar-thin">
                                 <div className="text-md text-gray-700" dangerouslySetInnerHTML={{ __html: mdRenderer.render(card.back) }}></div>
                             </div>
                         </div>

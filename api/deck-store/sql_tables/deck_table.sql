@@ -1,0 +1,10 @@
+CREATE IF NOT EXISTS TABLE deck (
+    deckid TEXT PRIMARY KEY, -- GUID
+    title TEXT NOT NULL,
+    length INTEGER,
+    updated DATETIME DEFAULT CURRENT_TIMESTAMP,
+    created DATETIME DEFAULT CURRENT_TIMESTAMP,
+    delete_date DATETIME DEFAULT NULL,
+    last_session DATETIME DEFAULT NULL,
+    score REAL CHECK (score >= 0 AND score <= 100) DEFAULT NULL
+);

@@ -5,7 +5,7 @@ import { CardPreview } from '~/lib/my-components/CardPreview';
 import { deckDraftAtom } from '~/lib/state/deckDraft';
 import { MarkdownRenderer } from '~/lib/utils/MarkdownRenderer';
 import CardEditor from '~/lib/my-components/CardEditor';
-import '~/styles/gruvbox-dark-soft.min.css';
+import '~/styles/atom-one-light.css';
 
 
 interface DeckPreviewProps {

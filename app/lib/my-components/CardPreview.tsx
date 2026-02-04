@@ -15,7 +15,6 @@ export const CardPreview: React.FC<CardPreviewProps> = ({ cards, previewIndex, o
 
     const [mdFront, mdBack] = useMemo(() => {
         const mdRenderer = new MarkdownRenderer();
-        // console.log(card.back);
         return [
             mdRenderer.render(card.front),
             mdRenderer.render(card.back),
@@ -44,7 +43,7 @@ export const CardPreview: React.FC<CardPreviewProps> = ({ cards, previewIndex, o
                     {/* {card.front} */}
                 </div>
                 <hr />
-                <div className=" text-sm overflow-x-auto" dangerouslySetInnerHTML={{ __html: mdBack }}>
+                <div className=" text-sm overflow-x-auto overflow-hidden" dangerouslySetInnerHTML={{ __html: mdBack }}>
                     {/* {card.back} */}
                 </div>
             </div>

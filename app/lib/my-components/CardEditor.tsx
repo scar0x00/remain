@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { X, Check } from "lucide-react";
 import { MarkdownRenderer } from "~/lib/utils/MarkdownRenderer";
-import '~/styles/gruvbox-dark-soft.min.css';
+import '~/styles/atom-one-light.css';
 
 
 interface CardEditorProps {

@@ -4,7 +4,7 @@
 
 - clsx
 - markdown-it
-- highlight.js (*gruvbox-dark-soft.min theme*)
+- highlight.js (*atom-one-light theme*)
 - @mdit/plugin-katex
 - react-router
 - jotai
