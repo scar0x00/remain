@@ -9,6 +9,19 @@
   --font-mono:
     "IBM Plex Mono", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
     "Courier New", monospace;
+
+
+  --animate-fast-spin: fast-spin 2s ease-in-out infinite;
+
+  @keyframes fast-spin {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(1800deg);
+    }
+  }
 }
 
 html,
@@ -148,6 +161,8 @@ body {
   pre {
     @apply my-8 px-4 py-4 rounded-xl overflow-x-auto leading-5 whitespace-pre text-left;
   }
+
+
 }
 
 
@@ -178,3 +193,7 @@ body {
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background-color: rgba(115, 115, 130, 0.8);
 }
+
+/* .katex-mathml {
+  visibility: hidden;
+} */

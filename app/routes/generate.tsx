@@ -37,9 +37,9 @@ export async function loader({ params }: Route.LoaderArgs) {
     const savedDecks = (
         await (await fetch(`${API_BASE}/api/v1/decks`)).json()
     ).decks.filter((deck: any) =>
-        !!(deck?.customMetadata?.title)
+        !!(deck?.title)
     )?.map((deck: any) => ({
-        title: deck.customMetadata.title,
+        title: deck.title,
         id: deck.key,
         url: `/generate/${deck.key}`,
         uploaded: new Date(deck.uploaded),
@@ -133,7 +133,7 @@ export default function Generate({
                 <Outlet />
             </div>
             <div className="-col-start-2 px-3 pb-2 bg-gray-50 overflow-y-auto overflow-x-clip scrollbar-thin relative">
-                <div className='sticky top-0 py-4 inline-flex justify-start items-center bg-gray-50 w-full' >
+                <div className='sticky top-0 py-4 inline-flex justify-start items-center bg-gray-50 w-full z-20' >
                     <h2 className="text-xl hover:cursor-pointer" onClick={() => setShowDeckCarousel(true)}>Deck <ScanEye className='inline size-6 hover:cursor-pointer text-gray-600' /></h2>
                     <div className="flex justify-center items-center ml-auto h-full">
                         {showToast && <ToastNotification message="Deck saved" isVisible={showToast} onClose={() => setShowToast(false)} />}

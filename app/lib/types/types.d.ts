@@ -14,8 +14,12 @@ interface Message {
 }
 
 interface SavedDeck {
+  key: string;
   title: string;
-  url: string
-  id: string,
-  uploaded: string
+  url: string;
+  id: string;
+  uploaded: Date;
+  length: number;
+  score: number;
+  last_session: string;
 }
