@@ -1,7 +1,13 @@
-const API_BASE = process.env.API_BASE_URL || '';
+import { API_BASE } from "./env.server";
 
-export async function getDeckById(deckId: string): Promise<Deck> {
-    const response = await fetch(`${API_BASE}/api/v1/deck/${deckId}`);
+export async function getDeckById(deckId: string, headers: Headers): Promise<Deck> {
+    const response = await fetch(
+        `${API_BASE}/api/v1/deck/${deckId}`,
+        {
+            headers,
+            credentials: "include"
+        }
+    );
     
     if (!response.ok) {
         throw new Error(`Failed to fetch deck: ${response.status} ${response.statusText}`);

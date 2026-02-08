@@ -7,24 +7,22 @@ import { Link } from "react-router";
 import { calculateTemporalDiff } from "~/lib/utils/calculateTemporalDiff";
 import { calculateTemporalDiffHours } from "~/lib/utils/calculateTemporalDiffHours";
 import { getScoreStyle } from "~/lib/utils/getScoreStyle";
+import { requireSession } from "~/lib/utils/requireSession";
+import { API_BASE } from "~/lib/utils/env.server";
 
 
-const API_BASE = process.env.API_BASE_URL || '';
-
-
-//  "decks": [
-//     {
-//       "key": "9516268f-a6b9-44a0-92c3-a88b782e64b1",
-//       "uploaded": "2026-02-04 06:55:53",
-//       "title": "Life and death about the great Simon Bolivar",
-//       "length": 12,
-//       "last_session": "2026-02-04 07:24:03",
-//       "score": 25
-//     },
-
-export async function loader() {
+export async function loader({
+    request
+}: Route.LoaderArgs) {
+    const user = await requireSession(request);
     const savedDecks = (
-        await (await fetch(`${API_BASE}/api/v1/decks`)).json()
+        await (await fetch(
+            `${API_BASE}/api/v1/decks`,
+            {
+                headers: request.headers,
+                credentials: "include"
+            }
+        )).json()
     ).decks.filter((deck: any) =>
         !!(deck?.title)
     )?.map((deck: any) => ({
@@ -47,7 +45,7 @@ export default function Decks({ loaderData }: Route.ComponentProps) {
         setSearchTerm(e.target.value);
     }, [setSearchTerm])
     return (
-        <div className="mt-3 px-1">
+        <div className="mt-8 px-1">
             <div className="flex items-center justify-between mx-3 mb-8">
                 <h1 className="text-2xl font-bold text-gray-400">Decks</h1>
                 <PanelRight className="text-gray-400" />

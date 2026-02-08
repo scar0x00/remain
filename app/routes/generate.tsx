@@ -1,6 +1,6 @@
-import { Outlet, redirect, type ShouldRevalidateFunctionArgs } from "react-router";
-import { BookA, CirclePlus, Save, ScanEye } from "lucide-react";
 import type { Route } from "./+types/generate";
+import { Outlet, redirect, useRouteLoaderData, type ShouldRevalidateFunctionArgs } from "react-router";
+import { BookA, CirclePlus, Save, ScanEye } from "lucide-react";
 import DeckPreview from "~/lib/my-components/DeckPreview";
 import { useAtom, useSetAtom } from "jotai";
 import { deckDraftAtom } from "~/lib/state/deckDraft";
@@ -13,9 +13,10 @@ import { useHydrateAtoms } from "jotai/utils";
 import { chatHistoryAtom } from "~/lib/state/chatHistory";
 import { titleAtom } from "~/lib/state/title.derived";
 import { SearchbleSavedDecks } from "~/lib/my-components/SearchableSavedDecks";
+import { requireSession } from "~/lib/utils/requireSession";
+import { API_BASE } from "~/lib/utils/env.server";
 
 
-const API_BASE = process.env.API_BASE_URL || '';
 
 export const links: Route.LinksFunction = () => [
     {
@@ -26,16 +27,26 @@ export const links: Route.LinksFunction = () => [
     },
 ]
 
-export async function loader({ params }: Route.LoaderArgs) {
+export async function loader({
+    params,
+    request
+}: Route.LoaderArgs) {
+    const user = await requireSession(request);
     if (params.chatId === undefined) {
         return redirect(`/generate/${crypto.randomUUID()}`)
     }
 
-    const chatHistory = await getChatHistory(params.chatId);
-    const deck = await getDeckById(params.chatId);
+    const chatHistory = await getChatHistory(params.chatId, user.id);
+    const deck = await getDeckById(params.chatId, request.headers);
 
     const savedDecks = (
-        await (await fetch(`${API_BASE}/api/v1/decks`)).json()
+        await (await fetch(
+            `${API_BASE}/api/v1/decks`,
+            {
+                headers: request.headers,
+                credentials: "include"
+            }
+        )).json()
     ).decks.filter((deck: any) =>
         !!(deck?.title)
     )?.map((deck: any) => ({
@@ -49,7 +60,6 @@ export async function loader({ params }: Route.LoaderArgs) {
     return {
         chatHistory,
         deck,
-        apiHost: API_BASE,
         savedDecks
     };
 }
@@ -83,12 +93,14 @@ export default function Generate({
     ]);
     const [deckDraft, setDeckDraft] = useAtom(deckDraftAtom);
     const setChatHistory = useSetAtom(chatHistoryAtom);
-    
+
+    const { API_BASE } = useRouteLoaderData('root');
+
     useEffect(() => {
         setChatHistory(loaderData.chatHistory);
         setDeckDraft(loaderData.deck);
     }, [loaderData.chatHistory, loaderData.deck]);
-   
+
 
 
     const [showDeckCarousel, setShowDeckCarousel] = useState(false);
@@ -97,7 +109,7 @@ export default function Generate({
     const [title, setTitle] = useAtom(titleAtom);
     useEffect(() =>
         setTitle(deckDraft?.title || "")
-    , [deckDraft?.title]);
+        , [deckDraft?.title]);
     const handleTitleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         setTitle(e.target.value);
     }, []);
@@ -117,7 +129,7 @@ export default function Generate({
                         </button>
                     </a>
                 </div>
-                <SearchbleSavedDecks savedDecks={loaderData.savedDecks}/>
+                <SearchbleSavedDecks savedDecks={loaderData.savedDecks} />
             </div>
             <div className="col-start-2 col-span-3 px-20 max-[1200px]:px-8 flex flex-col justify-between">
                 <div className="mt-2 flex items-center mx-16">
@@ -134,11 +146,11 @@ export default function Generate({
             </div>
             <div className="-col-start-2 px-3 pb-2 bg-gray-50 overflow-y-auto overflow-x-clip scrollbar-thin relative">
                 <div className='sticky top-0 py-4 inline-flex justify-start items-center bg-gray-50 w-full z-20' >
-                    <h2 className="text-xl hover:cursor-pointer" onClick={() => setShowDeckCarousel(true)}>Deck <ScanEye className='inline size-6 hover:cursor-pointer text-gray-600' /></h2>
+                    <h2 className="text-xl hover:cursor-pointer" onClick={() => setShowDeckCarousel(true)}>Deck <ScanEye className='inline size-4 hover:cursor-pointer text-gray-600' /></h2>
                     <div className="flex justify-center items-center ml-auto h-full">
                         {showToast && <ToastNotification message="Deck saved" isVisible={showToast} onClose={() => setShowToast(false)} />}
                         <Save className='inline size-6 hover:cursor-pointer text-gray-600' onClick={async () => {
-                            await fetch(`${loaderData.apiHost}/api/v1/deck/${params.chatId}`, {
+                            await fetch(`${API_BASE}/api/v1/deck/${params.chatId}`, {
                                 method: "PUT",
                                 body: JSON.stringify({
                                     title,
@@ -146,7 +158,8 @@ export default function Generate({
                                 }),
                                 headers: {
                                     'Content-Type': 'application/json'
-                                }
+                                },
+                                credentials: "include"
                             })
                             setShowToast(true);
                         }

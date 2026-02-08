@@ -1,11 +1,10 @@
 import { Hono } from "hono";
-import { D1Database } from "@cloudflare/workers-types";
+import { authMiddleware } from "./auth";
+import type { Bindings, Variables } from "./index";
 
-type Bindings = {
-  DECKS_DB: D1Database;
-};
+const studySession = new Hono<{ Bindings: Bindings, Variables: Variables }>();
 
-const studySession = new Hono<{ Bindings: Bindings }>();
+studySession.use(authMiddleware);
 
 studySession.post(
   "/:deckid",
@@ -26,14 +25,22 @@ studySession.post(
     try {
       await c.env.DECKS_DB.batch([
         c.env.DECKS_DB.prepare(`
-          INSERT INTO study_session (session_id, deckid, correct_count, incorrect_count, wrong_answers_indexes)
-          VALUES (?, ?, ?, ?, ?)
+          INSERT INTO study_session (
+            session_id,
+            deckid,
+            correct_count,
+            incorrect_count,
+            wrong_answers_indexes,
+            user_id
+          )
+          VALUES (?, ?, ?, ?, ?, ?)
         `).bind(
           session_id,
           deckid,
           correct_count ?? 0,
           incorrect_count ?? 0,
           wrong_answers_indexes ? JSON.stringify(wrong_answers_indexes) : "[]",
+          c.var.user.id
         ),
         c.env.DECKS_DB.prepare(`
           UPDATE deck 
@@ -43,8 +50,8 @@ studySession.post(
               ELSE (score + ?) / 2.0 
           END,
           last_session = datetime('now')
-          WHERE deckid = ?
-        `).bind(sessionScore, sessionScore, deckid)
+          WHERE deckid = ? AND owner_id = ?
+        `).bind(sessionScore, sessionScore, deckid, c.var.user.id)
       ]);
 
       return c.json({
@@ -63,8 +70,8 @@ studySession.post(
   const deckid = c.req.param("deckid");
   try {
     const { results } = await c.env.DECKS_DB.prepare(`
-      SELECT * FROM study_session WHERE deckid = ? ORDER BY timestamp DESC
-    `).bind(deckid).all();
+      SELECT * FROM study_session WHERE deckid = ? AND owner_id = ? ORDER BY timestamp DESC
+    `).bind(deckid, c.var.user.id).all();
 
     return c.json({
       error: null,

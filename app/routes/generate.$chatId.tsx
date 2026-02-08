@@ -8,6 +8,7 @@ import { useCallback, useEffect, useRef, useState, type ChangeEvent } from "reac
 import { getAgentCompletion } from "~/lib/agents/deckGenerationAgent";
 import { deckDraftAtom } from "~/lib/state/deckDraft";
 import clsx from "clsx";
+import { requireSession } from "~/lib/utils/requireSession";
 
 
 
@@ -15,6 +16,7 @@ export async function action({
     request,
     params
 }: Route.ActionArgs) {
+    const user = await requireSession(request);
     let formData = await request.formData();
     let fileContent: string | undefined = undefined;
     if (formData.get("knowledge-source")) {
@@ -39,7 +41,7 @@ export async function action({
     const response = await getAgentCompletion({
         userMessage: message,
         threadId: params.chatId,
-        userId: "1"
+        userId: user.id
     });
     return {
         role: "agent",

@@ -10,6 +10,14 @@ import { Provider } from 'jotai'
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import { API_BASE } from "./lib/utils/env.server";
+
+
+export function loader() {
+  return {
+    API_BASE
+  }
+}
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },

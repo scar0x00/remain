@@ -1,125 +1,68 @@
-import { Context, Hono } from "hono";
+import { Hono } from "hono";
 import { studySession } from "./study_session";
+import { userSessions } from "./user_sessions";
+import { deck, listDecksHandler } from "./deck";
+import { authMiddleware } from "./auth";
 import { cors } from "hono/cors";
-import { D1Database, R2Bucket } from "@cloudflare/workers-types";
+import { D1Database, KVNamespace, R2Bucket } from "@cloudflare/workers-types";
 
-type Bindings = {
-  DECK_BUCKET: R2Bucket;
-  DECKS_DB: D1Database;
+export type User = {
+  id: string;
+  name: string;
+  email: string;
+  emailVerified: boolean;
+  image: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  username: string;
+  displayUsername: string;
 };
 
-const deck = new Hono<{ Bindings: Bindings }>();
-const app = new Hono<{ Bindings: Bindings }>();
+export type Session = {
+  userId: string;
+  expiresAt: Date;
+  token: string;
+  ipAddress: string;
+  userAgent: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
-app.use("*", cors());
+export type Variables = {
+  user: User;
+  session: Session;
+};
 
-deck.get("/:deckid", async (c) => {
-  const object = await c.env.DECK_BUCKET.get(c.req.param("deckid"));
-  const content = await object?.json();
-  if (content !== undefined) return c.json(content);
+export type Bindings = {
+  DECK_BUCKET: R2Bucket;
+  DECKS_DB: D1Database;
+  REMAIN_SESSIONS: KVNamespace;
+  BETTER_AUTH_SECRET: string;
+};
 
-  return c.json([]);
-}).put(async (c) => {
-  const body = await c.req.json();
-  const deckid = c.req.param("deckid");
+const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
-  if (body == "") {
-    c.status(400);
-    return c.json({
-      error: "File not found",
-    });
-  }
+app.use("*", cors({
+  origin: (origin, c) => c.env.APP_BASE,
+  credentials: true
+}));
 
-  const length = body.cards?.length || 0;
 
-  await c.env.DECKS_DB.prepare(`
-  INSERT INTO deck (deckid, title, length)
-  VALUES (?, ?, ?)
-  ON CONFLICT(deckid) DO UPDATE SET
-    title = excluded.title,
-    length = excluded.length,
-    updated = datetime('now')
-  `).bind(deckid, body.title, length).run();
-
-  await c.env.DECK_BUCKET.put(
-    deckid,
-    JSON.stringify(body),
-    {
-      customMetadata: {
-        title: body.title,
-        length: length,
-      },
-    },
-  );
-
-  return c.json({
-    error: null,
-    url: `/deck/${deckid}`,
-  });
-}).delete(async (c) => {
-  const hard = c.req.query("hard");
-  try {
-    if (hard === "true") {
-      await c.env.DECK_BUCKET.delete(c.req.param("deckid"));
-      await c.env.DECKS_DB.prepare(`
-      DELETE FROM deck WHERE deckid = ?
-    `).bind(c.req.param("deckid")).run();
-    } else {
-      await c.env.DECKS_DB.prepare(`
-        UPDATE deck 
-        SET delete_date = datetime('now'),
-            updated = datetime('now')
-        WHERE deckid = ? AND delete_date IS NULL
-      `).bind(c.req.param("deckid")).run();
-    }
-
-    return c.json({
-      error: null,
-    });
-  } catch (e) {
-    return c.json({
-      error: e,
-    });
-  }
-});
-
-const listDecksHandler = async (c: Context<{ Bindings: Bindings }>) => {
-  try {
-    const { results } = await c.env.DECKS_DB.prepare(`
-      SELECT deckid, title, length, created, last_session, score
-      FROM deck
-      WHERE delete_date IS NULL
-      ORDER BY created DESC
-      LIMIT 15
-    `).all();
-
-    return c.json({
-      error: null,
-      decks: results.map((deck: any) => ({
-        key: deck.deckid,
-        uploaded: deck.created,
-        title: deck.title,
-        length: deck.length,
-        last_session: deck.last_session,
-        score: deck.score,
-      })),
-    });
-  } catch (e: any) {
-    console.error("Error listing decks:", e);
-    return c.json({
-      error: e.message || "Failed to list decks",
-      decks: [],
-    });
-  }
-}
-
-app.get("/decks", listDecksHandler);
-app.get("/api/v1/decks", listDecksHandler);
+app.use("/decks", authMiddleware);
+app.use("/api/v1/decks", authMiddleware);
+app.on(
+  "GET",
+  ["/decks", "/api/v1/decks"],
+  listDecksHandler
+);
 
 app.route("deck", deck);
 app.route("api/v1/deck", deck);
 
 app.route("/study_session", studySession);
 app.route("api/v1/study_session", studySession);
+
+app.route("/user_session", userSessions);
+app.route("api/v1/user_session", userSessions);
 
 export default app;

@@ -6,8 +6,8 @@ import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 
-console.log(import.meta.url);
-console.log(process.argv[1]);
+// console.log(import.meta.url);
+// console.log(process.argv[1]);
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SYSTEM_PROMPT = readFileSync(
@@ -56,14 +56,21 @@ export async function getAgentCompletion({
     config,
   );
 
-
   return response;
 }
 
 export async function getChatHistory(
   threadId: string,
+  userId: string,
 ): Promise<{ role: "user" | "agent"; content: string }[]> {
-  const config = { configurable: { thread_id: threadId } };
+  const config = {
+    configurable: {
+      thread_id: threadId,
+    },
+    context: {
+      user_id: userId,
+    },
+  };
 
   // Get the most recent checkpoint (contains full conversation history)
   const checkpointTuple = await checkpointer.getTuple(config);
