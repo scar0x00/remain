@@ -32,7 +32,7 @@ export default function Login() {
     };
 
     return (
-        <div className="mt-8 px-4 max-w-sm mx-auto">
+        <div className="mt-2 px-4 max-w-sm mx-auto">
             <div className="flex items-center justify-between mb-12">
                 <h1 className="text-2xl font-bold text-gray-400">Login</h1>
                 <PanelRight className="text-gray-400" />

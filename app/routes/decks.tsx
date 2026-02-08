@@ -9,6 +9,7 @@ import { calculateTemporalDiffHours } from "~/lib/utils/calculateTemporalDiffHou
 import { getScoreStyle } from "~/lib/utils/getScoreStyle";
 import { requireSession } from "~/lib/utils/requireSession";
 import { API_BASE } from "~/lib/utils/env.server";
+import { useNavbar } from "~/lib/my-components/Navbar";
 
 
 export async function loader({
@@ -43,17 +44,35 @@ export default function Decks({ loaderData }: Route.ComponentProps) {
     const throttleSearchTerm = useThrottle(searchTerm, 400);
     const handleOnChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
-    }, [setSearchTerm])
+    }, [setSearchTerm]);
+    const { setShowNavbar, Navbar } = useNavbar();
+
     return (
-        <div className="mt-8 px-1">
+        <div className="mt-2 px-1">
+            <Navbar
+                links={[
+                    {
+                        displayText: "Generate",
+                        url: "/generate"
+                    },
+                    {
+                        displayText: "Decks",
+                        url: "/decks"
+                    },
+                    {
+                        displayText: "My profile",
+                        url: "/my"
+                    }
+                ]}
+            ></Navbar>
             <div className="flex items-center justify-between mx-3 mb-8">
                 <h1 className="text-2xl font-bold text-gray-400">Decks</h1>
-                <PanelRight className="text-gray-400" />
+                <PanelRight className="text-gray-400" onClick={() => setShowNavbar(true)}/>
             </div>
             <div className="flex items-center justify-center mb-3">
                 <input type="text" id="search-deck" className={`
                     text-base border-2 py-1 px-2 rounded-md border-gray-200 transition-colors
-                        focus:outline-none focus:border-gray-400 w-[80%] mr-1 mb-2
+                        focus:outline-none focus:border-gray-400 w-[80%] mr-1
                 `} onChange={handleOnChange} />
                 <Search className="text-gray-400" />
             </div>
