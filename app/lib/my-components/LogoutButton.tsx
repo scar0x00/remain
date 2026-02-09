@@ -19,7 +19,8 @@ export function LogoutButton({
         }
         authClient.revokeSession({
             token
-        })
+        });
+        navigate("/login");
     }, []);
 
     return (

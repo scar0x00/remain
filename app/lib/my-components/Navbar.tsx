@@ -1,13 +1,12 @@
 import { NavLink } from "react-router";
 import { CircleX } from "lucide-react";
 import { LogoutButton } from "./LogoutButton";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 export const useNavbar = () => {
     const [show, setShowNavbar] = useState(false);
-
-    return {
-        Navbar: function Navbar({
+    const NavbarComponent = useMemo(() => {
+        return function Navbar({
             links
         }: {
             links?: {
@@ -23,21 +22,23 @@ export const useNavbar = () => {
                             <CircleX size={32} className="text-gray-500" />
                         </button>
                         <ul className={
-                            `row-span-7 flex flex-col justify-start items-center gap-8
-                            *:text-xl *:text-center`
+                            `row-span-7 flex flex-col justify-start items-center gap-4
+                            *:text-lg *:text-center`
                         }>
                             {links?.map((link, i) => {
                                 return (
                                     <li key={i} className="">
-                                        <NavLink 
+                                        <NavLink
                                             to={link.url}
-                                            className={({isActive, isPending}) => {
+                                            className={({ isActive, isPending }) => {
                                                 return (
-                                                    isActive ? 
-                                                    "bg-gray-500 text-gray-50 text-center p-2 rounded-md before:content-['->_'] before:text-sm before:align-middle" : ""
+                                                    isActive ?
+                                                        "bg-gray-500 text-gray-50 font-bold text-center p-2 rounded-md before:content-['->_'] before:text-sm before:align-middle" : ""
                                                 );
                                             }}
-                                        >{link.displayText}</NavLink>
+                                        >
+                                            {link.displayText}
+                                        </NavLink>
                                     </li>
                                 )
                             })}
@@ -46,7 +47,11 @@ export const useNavbar = () => {
                     </nav>
                 </div>
             );
-        },
+        }
+    }, [show]);
+
+    return {
+        Navbar: NavbarComponent,
         setShowNavbar
-    }
+    };
 };

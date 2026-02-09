@@ -148,17 +148,17 @@ export default function GenerateChatId({
 
     return (
         <>
-            <div className="w-full h-2/3 pt-1 px-24 max-[1600px]:px-8">
+            <div className="w-full min-[1100px]:h-2/3 max-[1100px]:h-[61dvh] pt-1 px-24 max-[1600px]:px-8 max-[900px]:px-2">
                 <ChatHistory messages={chatHistory} />
             </div>
-            <div className="pb-12 w-full flex flex-col items-center">
+            <div className="pb-6 w-full flex flex-col items-center">
                 <div className="h-8 flex flex-col items-center justify-center">
                     <div className={clsx(
                         "size-4 bg-gray-800 rounded-[4px] transition-all animate-fast-spin",
                         fetcher.state === 'submitting' ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
                     )} id="spinner"></div>
                 </div>
-                <fetcher.Form className={`${fetcher.state === 'submitting' && 'animate-pulse'} has-focus:shadow-lg has-focus:scale-[1.01] transition-all rounded-md ease-in-out duration-200 w-[calc(12/13*100%)] flex flex-col items-stretch focus:border-gray-400 focus:border-2 focus:border-solid`} method="post" encType="multipart/form-data">
+                <fetcher.Form className={`${fetcher.state === 'submitting' && 'animate-pulse'} has-focus:shadow-lg has-focus:scale-[1.01] transition-all rounded-2xl ease-in-out duration-200 w-[calc(12/13*100%)] flex flex-col items-stretch focus:border-gray-400 focus:border-2 focus:border-solid`} method="post" encType="multipart/form-data">
                     <textarea
                         value={prompt}
                         onChange={handleTextareaChange}
@@ -166,7 +166,7 @@ export default function GenerateChatId({
                         disabled={
                             fetcher.state === 'submitting'
                         }
-                        className="resize-none w-full border-2 border-b-transparent h-24 p-4  focus:outline-none focus:ring-0 rounded-t-md
+                        className="resize-none w-full border-2 border-b-transparent h-24 p-4  focus:outline-none focus:ring-0 rounded-t-2xl
                         scrollbar-thin
                         scrollbar-track-transparent
                         scrollbar-thumb:neutral-700/40
@@ -181,7 +181,7 @@ export default function GenerateChatId({
                         id="user-message-field"
                     >
                     </textarea>
-                    <div className="grid grid-cols-4 grid-rows-1 gap-3 py-2 border-2 border-t-transparent px-2 rounded-b-md">
+                    <div className="grid grid-cols-4 grid-rows-1 gap-3 py-2 border-2 border-t-transparent px-2 rounded-b-2xl sticky bottom-1">
                         <div className="inline-flex col-span-2">
                             <label htmlFor="knowledge-source" className="justify-self-start p-1.5 border-2 border-gray-400 rounded-full hover:cursor-pointer">
                                 <Paperclip size={18} strokeWidth={1.5} className="text-gray-400" />

@@ -46,17 +46,17 @@ export default function DeckCarousel({ cards, onClose }: DeckCarouselProps) {
                 >
                     <X className="h-5 w-5" />
                 </button>
-                <div ref={containerRef} tabIndex={0} className="h-[75vh] w-150 overflow-y-auto scrollbar-thin scroll-smooth snap-y snap-mandatory rounded-lg bg-white shadow-2xl outline-none">
+                <div ref={containerRef} tabIndex={0} className="h-[75vh] w-150 max-[700px]:w-[90dvw] overflow-y-auto scrollbar-thin scroll-smooth snap-y snap-mandatory rounded-lg bg-white shadow-2xl outline-none">
                     {cards.map((card, index) => (
                         <div
                             key={index}
                             className="min-h-[25vh] w-full snap-start flex flex-col items-center justify-center p-8 gap-3"
                         >
                             <div className="text-center">
-                                <div className="text-lg" dangerouslySetInnerHTML={{ __html: mdRenderer.render(card.front) }}></div>
+                                <div className="text-lg max-[700px]:text-base" dangerouslySetInnerHTML={{ __html: mdRenderer.render(card.front) }}></div>
                             </div>
                             <div className="text-center border-t pt-4 overflow-x-auto overflow-hidden max-w-full scrollbar-thin">
-                                <div className="text-md text-gray-700" dangerouslySetInnerHTML={{ __html: mdRenderer.render(card.back) }}></div>
+                                <div className="text-md max-[700px]:text-sm text-gray-700" dangerouslySetInnerHTML={{ __html: mdRenderer.render(card.back) }}></div>
                             </div>
                         </div>
                     ))}

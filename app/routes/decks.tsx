@@ -15,7 +15,7 @@ import { useNavbar } from "~/lib/my-components/Navbar";
 export async function loader({
     request
 }: Route.LoaderArgs) {
-    const user = await requireSession(request);
+    await requireSession(request);
     const savedDecks = (
         await (await fetch(
             `${API_BASE}/api/v1/decks`,
