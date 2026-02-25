@@ -1,7 +1,7 @@
 import type { Route } from "./+types/decks";
 import { useThrottle } from "@uidotdev/usehooks";
 import clsx from "clsx";
-import { BookA, PanelRight, Search } from "lucide-react";
+import { BookA, Menu, Search } from "lucide-react";
 import { useCallback, useState } from "react";
 import { Link } from "react-router";
 import { calculateTemporalDiff } from "~/lib/utils/calculateTemporalDiff";
@@ -67,7 +67,7 @@ export default function Decks({ loaderData }: Route.ComponentProps) {
             ></Navbar>
             <div className="flex items-center justify-between mx-3 mb-8">
                 <h1 className="text-2xl font-bold text-gray-400">Decks</h1>
-                <PanelRight className="text-gray-400" onClick={() => setShowNavbar(true)}/>
+                <Menu className="text-gray-400 hover:cursor-pointer" onClick={() => setShowNavbar(true)}/>
             </div>
             <div className="flex items-center justify-center mb-3">
                 <input type="text" id="search-deck" className={`

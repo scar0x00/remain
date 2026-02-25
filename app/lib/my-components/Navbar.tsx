@@ -16,9 +16,12 @@ export const useNavbar = () => {
         }) {
             if (!show) return null;
             return (
-                <div className={`fixed inset-0 w-full bg-gray-100/60 transition-all ease-out duration-200 backdrop-blur-xs`}>
+                <div className={`fixed inset-0 w-full bg-gray-100/60 transition-all ease-out duration-200 backdrop-blur-xs z-50`}>
                     <nav className="absolute inset-x-12 inset-y-14 grid grid-cols-1 grid-rows-10 gap-2">
-                        <button className="justify-self-end row-span-1" onClick={() => setShowNavbar(false)}>
+                        <button className="justify-self-end row-span-1 hover:cursor-pointer" onClick={() => {
+                            console.log("closing!");
+                            setShowNavbar(false);
+                        }}>
                             <CircleX size={32} className="text-gray-500" />
                         </button>
                         <ul className={
@@ -28,7 +31,7 @@ export const useNavbar = () => {
                             {links?.map((link, i) => {
                                 return (
                                     <li key={i} className="">
-                                        <NavLink
+                                        <NavLink viewTransition
                                             to={link.url}
                                             className={({ isActive, isPending }) => {
                                                 return (

@@ -7,13 +7,13 @@ import { cn } from "~/lib/utils";
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
+    const [error, setError] = useState({ message: "", email: "" });
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError("");
+        // setError({message: "", email: ""});
         setLoading(true);
 
         const { error: signInError } = await authClient.signIn.email({
@@ -22,7 +22,10 @@ export default function Login() {
         }, {
             onRequest: () => setLoading(true),
             onResponse: () => setLoading(false),
-            onError: (ctx) => setError(ctx.error.message || "Invalid email or password"),
+            onError: (ctx) => setError({
+                message: ctx.error.message || "Invalid email or password",
+                email
+            }),
             onSuccess: () => navigate("/decks"),
         });
 
@@ -39,11 +42,28 @@ export default function Login() {
             </div>
 
             <form onSubmit={handleLogin} className="space-y-4" id="login-form">
-                {error && (
+                {error.message && (
                     <div className="text-sm text-red-500 mb-4 px-1">
-                        {error}
+                        {error?.message}
                     </div>
                 )}
+
+                {
+                    error.message === "Email not verified" &&
+                    <button
+                        className={`hover:cursor-pointer text-sm text-gray-400 underline`}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            authClient.sendVerificationEmail({
+                                email: error.email,
+                                callbackURL: "/login"
+                            });
+                            setError({message: "", email: ""});
+                        }}
+                    >
+                        Click here to send verification email again
+                    </button>
+                }
 
                 <div className="space-y-1">
                     <label className="text-sm font-medium text-gray-500 px-1 flex items-center gap-2">
@@ -96,6 +116,6 @@ export default function Login() {
                     </Link>
                 </p>
             </div>
-        </div>
+        </div >
     );
 }

@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import 'tailwind-animations';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -169,7 +170,7 @@ body {
 .scrollbar-thin {
   scrollbar-width: thin;
   scrollbar-color: rgba(115, 115, 115, 0.4) transparent;
-  transition: scrollbar-color 0.2s ease, background-color 0.2s ease;
+  /* transition: scrollbar-color 0.2s ease, background-color 0.2s ease; */
 }
 
 .scrollbar-thin:hover {

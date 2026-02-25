@@ -61,7 +61,6 @@ export default function GenerateChatId({
     const fetcher = useFetcher();
 
     useEffect(() => {
-        // console.log(chatHistory);
         if (fetcher.data !== undefined) {
             if (fileInputRef.current !== null) {
                 fileInputRef.current.value = '';
