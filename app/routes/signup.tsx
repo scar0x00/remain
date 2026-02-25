@@ -36,7 +36,11 @@ export default function Signup() {
     };
 
     return (
+<<<<<<< HEAD
         <div className="mt-8 px-4 max-w-sm mx-auto">
+=======
+        <div className="mt-2 px-4 max-w-sm mx-auto">
+>>>>>>> dev
             <div className="flex items-center justify-between mb-12">
                 <h1 className="text-2xl font-bold text-gray-400">Sign Up</h1>
                 <PanelRight className="text-gray-400" />

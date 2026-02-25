@@ -6,7 +6,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
-import { Provider } from 'jotai'
+import { Provider } from 'jotai';
 
 import type { Route } from "./+types/root";
 import "./app.css";

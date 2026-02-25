@@ -1,9 +1,11 @@
 import MessageEntry from "~/lib/my-components/MessageEntry";
+import clsx from "clsx";
 
-export const ChatHistory = ({ messages } : { messages: Message[] }) => {
+export const ChatHistory = ({ messages }: { messages: Message[] }) => {
+
   return (
     <div id="chat"
-      className="flex flex-col gap-4 w-full h-full px-3 
+      className={clsx(`flex flex-col gap-4 w-full h-full px-3 
       overflow-y-auto
       scrollbar-thin
       scrollbar-track-transparent
@@ -14,7 +16,7 @@ export const ChatHistory = ({ messages } : { messages: Message[] }) => {
       [&::-webkit-scrollbar-thumb]:bg-neutral-600/50
       [&::-webkit-scrollbar-thumb]:rounded-xl
       hover:[&::-webkit-scrollbar-thumb]:bg-neutral-500/80
-      transition-colors"
+      `)}
     >
       {messages.map((message, index) => (
         <MessageEntry message={message} key={index} />

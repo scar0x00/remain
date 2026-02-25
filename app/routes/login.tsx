@@ -7,13 +7,21 @@ import { cn } from "~/lib/utils";
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+<<<<<<< HEAD
     const [error, setError] = useState("");
+=======
+    const [error, setError] = useState({ message: "", email: "" });
+>>>>>>> dev
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
+<<<<<<< HEAD
         setError("");
+=======
+        // setError({message: "", email: ""});
+>>>>>>> dev
         setLoading(true);
 
         const { error: signInError } = await authClient.signIn.email({
@@ -22,7 +30,14 @@ export default function Login() {
         }, {
             onRequest: () => setLoading(true),
             onResponse: () => setLoading(false),
+<<<<<<< HEAD
             onError: (ctx) => setError(ctx.error.message || "Invalid email or password"),
+=======
+            onError: (ctx) => setError({
+                message: ctx.error.message || "Invalid email or password",
+                email
+            }),
+>>>>>>> dev
             onSuccess: () => navigate("/decks"),
         });
 
@@ -32,19 +47,49 @@ export default function Login() {
     };
 
     return (
+<<<<<<< HEAD
         <div className="mt-8 px-4 max-w-sm mx-auto">
+=======
+        <div className="mt-2 px-4 max-w-sm mx-auto">
+>>>>>>> dev
             <div className="flex items-center justify-between mb-12">
                 <h1 className="text-2xl font-bold text-gray-400">Login</h1>
                 <PanelRight className="text-gray-400" />
             </div>
 
             <form onSubmit={handleLogin} className="space-y-4" id="login-form">
+<<<<<<< HEAD
                 {error && (
                     <div className="text-sm text-red-500 mb-4 px-1">
                         {error}
                     </div>
                 )}
 
+=======
+                {error.message && (
+                    <div className="text-sm text-red-500 mb-4 px-1">
+                        {error?.message}
+                    </div>
+                )}
+
+                {
+                    error.message === "Email not verified" &&
+                    <button
+                        className={`hover:cursor-pointer text-sm text-gray-400 underline`}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            authClient.sendVerificationEmail({
+                                email: error.email,
+                                callbackURL: "/login"
+                            });
+                            setError({message: "", email: ""});
+                        }}
+                    >
+                        Click here to send verification email again
+                    </button>
+                }
+
+>>>>>>> dev
                 <div className="space-y-1">
                     <label className="text-sm font-medium text-gray-500 px-1 flex items-center gap-2">
                         <Mail size={14} /> Email
@@ -96,6 +141,10 @@ export default function Login() {
                     </Link>
                 </p>
             </div>
+<<<<<<< HEAD
         </div>
+=======
+        </div >
+>>>>>>> dev
     );
 }
