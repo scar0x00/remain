@@ -1,18 +1,14 @@
 import { getDeckById } from "~/lib/utils/getDeckById";
 import type { Route } from "./+types/study.$deckId";
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MarkdownRenderer } from "~/lib/utils/MarkdownRenderer";
-import { ArrowLeft, Plus, RotateCcw } from "lucide-react";
-import '~/styles/atom-one-light.css';
-import { Link, useRevalidator } from "react-router";
+import { ArrowLeft, RotateCcw } from "lucide-react";
+import { Link, useRevalidator, useRouteLoaderData } from "react-router";
 import clsx from "clsx";
+import '~/styles/atom-one-light.css';
 
-
-// const API_BASE = process.env.API_BASE_URL || '';
-
-
-export async function loader({ params }: Route.LoaderArgs) {
-    const deck = await getDeckById(params.deckId);
+export async function loader({ params, request }: Route.LoaderArgs) {
+    const deck = await getDeckById(params.deckId, request.headers);
 
     return {
         deck,
@@ -36,6 +32,9 @@ export default function Study({
 }: Route.ComponentProps) {
     const [cardIndex, setCardIndex] = useState(0);
     const revalidator = useRevalidator();
+
+    const { API_BASE } = useRouteLoaderData('root');
+
 
 
     const [showBack, setShowBack] = useState(false);
@@ -72,7 +71,7 @@ export default function Study({
     useEffect(() => {
         const isFinished = cardIndex === loaderData.deck.cards.length;
         if (isFinished && loaderData.deck.cards.length > 0) {
-            const res = fetch(`${"http://192.168.1.108:8787"}/api/v1/study_session/${loaderData.deckId}`, {
+            const res = fetch(`${API_BASE}/api/v1/study_session/${loaderData.deckId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -81,9 +80,10 @@ export default function Study({
                     wrong_answers_indexes: results.wrongIndexes,
                     session_id: loaderData.sessionId
                 }),
+                credentials: "include"
             })
-            .catch(err => console.error("Failed to sync study session:", err))
-            .then((r) => r?.json()).then(console.log);
+                .catch(err => console.error("Failed to sync study session:", err))
+                .then((r) => r?.json()).then(console.log);
         }
     }, [cardIndex, loaderData.deck.cards.length, loaderData.deckId, results]);
 

@@ -1,5 +1,6 @@
 CREATE IF NOT EXISTS TABLE deck (
     deckid TEXT PRIMARY KEY, -- GUID
+    owner_id TEXT DEFAULT NULL,
     title TEXT NOT NULL,
     length INTEGER,
     updated DATETIME DEFAULT CURRENT_TIMESTAMP,

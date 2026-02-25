@@ -3,18 +3,12 @@
 	"name": "deck-store",
 	"main": "src/index.ts",
 	"compatibility_date": "2026-01-20",
-	// "compatibility_flags": [
-	//   "nodejs_compat"
-	// ],
+	"compatibility_flags": [
+	  "nodejs_als"
+	],
 	// "vars": {
 	//   "MY_VAR": "my-variable"
 	// },
-	// "kv_namespaces": [
-	//   {
-	//     "binding": "MY_KV_NAMESPACE",
-	//     "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-	//   }
-	// ],
 	"r2_buckets": [
 		{
 			"binding": "DECK_BUCKET",
@@ -29,13 +23,12 @@
 			// "remote": true
 		},
 	],
-	// "d1_databases": [
-	//   {
-	//     "binding": "DECKS",
-	//     "database_name": "decks",
-	//     "database_id": "decks"
-	//   },
-	// ],
+	"kv_namespaces": [
+		{
+			"binding": "REMAIN_SESSIONS",
+			"id": "e352e0325c38438089ba96058f980b2e"
+		}
+	],
 	// "durable_objects": {
 	//   "bindings": [
 	//     {

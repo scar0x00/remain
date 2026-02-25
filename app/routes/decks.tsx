@@ -1,30 +1,29 @@
 import type { Route } from "./+types/decks";
 import { useThrottle } from "@uidotdev/usehooks";
 import clsx from "clsx";
-import { BookA, PanelRight, Search } from "lucide-react";
+import { BookA, Menu, Search } from "lucide-react";
 import { useCallback, useState } from "react";
 import { Link } from "react-router";
 import { calculateTemporalDiff } from "~/lib/utils/calculateTemporalDiff";
 import { calculateTemporalDiffHours } from "~/lib/utils/calculateTemporalDiffHours";
 import { getScoreStyle } from "~/lib/utils/getScoreStyle";
+import { requireSession } from "~/lib/utils/requireSession";
+import { API_BASE } from "~/lib/utils/env.server";
+import { useNavbar } from "~/lib/my-components/Navbar";
 
 
-const API_BASE = process.env.API_BASE_URL || '';
-
-
-//  "decks": [
-//     {
-//       "key": "9516268f-a6b9-44a0-92c3-a88b782e64b1",
-//       "uploaded": "2026-02-04 06:55:53",
-//       "title": "Life and death about the great Simon Bolivar",
-//       "length": 12,
-//       "last_session": "2026-02-04 07:24:03",
-//       "score": 25
-//     },
-
-export async function loader() {
+export async function loader({
+    request
+}: Route.LoaderArgs) {
+    await requireSession(request);
     const savedDecks = (
-        await (await fetch(`${API_BASE}/api/v1/decks`)).json()
+        await (await fetch(
+            `${API_BASE}/api/v1/decks`,
+            {
+                headers: request.headers,
+                credentials: "include"
+            }
+        )).json()
     ).decks.filter((deck: any) =>
         !!(deck?.title)
     )?.map((deck: any) => ({
@@ -45,17 +44,35 @@ export default function Decks({ loaderData }: Route.ComponentProps) {
     const throttleSearchTerm = useThrottle(searchTerm, 400);
     const handleOnChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
-    }, [setSearchTerm])
+    }, [setSearchTerm]);
+    const { setShowNavbar, Navbar } = useNavbar();
+
     return (
-        <div className="mt-3 px-1">
+        <div className="mt-2 px-1">
+            <Navbar
+                links={[
+                    {
+                        displayText: "Generate",
+                        url: "/generate"
+                    },
+                    {
+                        displayText: "Decks",
+                        url: "/decks"
+                    },
+                    {
+                        displayText: "My profile",
+                        url: "/my"
+                    }
+                ]}
+            ></Navbar>
             <div className="flex items-center justify-between mx-3 mb-8">
                 <h1 className="text-2xl font-bold text-gray-400">Decks</h1>
-                <PanelRight className="text-gray-400" />
+                <Menu className="text-gray-400 hover:cursor-pointer" onClick={() => setShowNavbar(true)}/>
             </div>
             <div className="flex items-center justify-center mb-3">
                 <input type="text" id="search-deck" className={`
                     text-base border-2 py-1 px-2 rounded-md border-gray-200 transition-colors
-                        focus:outline-none focus:border-gray-400 w-[80%] mr-1 mb-2
+                        focus:outline-none focus:border-gray-400 w-[80%] mr-1
                 `} onChange={handleOnChange} />
                 <Search className="text-gray-400" />
             </div>
